@@ -53,7 +53,21 @@ private fun CircuitPatternOverlay(
             alpha = 0.4f // Adjust opacity to blend with dark background
         )
 
-        // 2. The Vignette Effect (Deep Dive)
+        // 2. Scrim (Gradient)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Black.copy(alpha = 0.9f), // Top: Dark for readability
+                            Color.Black.copy(alpha = 0.4f)  // Bottom: Reveal circuit
+                        )
+                    )
+                )
+        )
+
+        // 3. The Vignette Effect (Deep Dive)
         // Center is transparent (shows circuit), Edges are solid black
         Box(
             modifier = Modifier

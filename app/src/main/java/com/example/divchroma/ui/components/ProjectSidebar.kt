@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,9 +36,7 @@ import com.example.divchroma.ui.theme.DivChromaTheme
 import com.example.divchroma.ui.theme.InactiveState
 import com.example.divchroma.ui.theme.NeonEmerald
 import com.example.divchroma.ui.theme.SectionHeaderStyle
-import com.example.divchroma.ui.theme.TabLabelStyle
 import com.example.divchroma.ui.theme.TextMuted
-import com.example.divchroma.ui.theme.TextPrimary
 
 /**
  * ProjectSidebar - Narrow vertical sidebar for project tabs
@@ -77,7 +74,7 @@ fun ProjectSidebar(
                 isSelected = project.id == selectedProjectId,
                 onClick = { onProjectSelected(project) }
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
@@ -112,38 +109,26 @@ private fun ProjectTabItem(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // LED Indicator
+        // Project icon button - active state is the box itself
         Box(
             modifier = Modifier
-                .size(6.dp)
-                .clip(CircleShape)
-                .background(
-                    if (isSelected) ActiveGlow else Color(0xFF1A1A1A)
+                .size(48.dp) // Slight increase for better touch target
+                .clip(RoundedCornerShape(12.dp))
+                .background(backgroundColor)
+                .border(
+                    width = if (isSelected) 1.5.dp else 0.dp, // Thinner border for active
+                    color = borderColor,
+                    shape = RoundedCornerShape(12.dp)
                 )
                 .then(
                     if (isSelected) {
                         Modifier.shadow(
-                            elevation = 4.dp,
-                            shape = CircleShape,
+                            elevation = 12.dp,
+                            shape = RoundedCornerShape(12.dp),
                             ambientColor = ActiveGlow,
                             spotColor = ActiveGlow
                         )
                     } else Modifier
-                )
-        )
-        
-        Spacer(modifier = Modifier.height(6.dp))
-        
-        // Project icon button
-        Box(
-            modifier = Modifier
-                .size(44.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(backgroundColor)
-                .border(
-                    width = if (isSelected) 2.dp else 1.dp,
-                    color = borderColor,
-                    shape = RoundedCornerShape(10.dp)
                 )
                 .clickable { onClick() },
             contentAlignment = Alignment.Center
@@ -155,16 +140,6 @@ private fun ProjectTabItem(
                 textAlign = TextAlign.Center
             )
         }
-        
-        Spacer(modifier = Modifier.height(4.dp))
-        
-        // Project name (truncated)
-        Text(
-            text = project.name.take(6),
-            style = TabLabelStyle,
-            color = if (isSelected) TextPrimary else TextMuted,
-            textAlign = TextAlign.Center
-        )
     }
 }
 

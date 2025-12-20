@@ -33,27 +33,7 @@ val MonospaceFamily = FontFamily.Monospace
 // Custom Text Styles (for direct use in Composables)
 // ===========================================================================
 
-/**
- * Style for the main app title
- */
-val AppTitleStyle = TextStyle(
-    fontFamily = BbhHegartyFamily,
-    fontWeight = FontWeight.Normal,
-    fontSize = 28.sp,
-    lineHeight = 34.sp,
-    letterSpacing = 2.sp
-)
 
-/**
- * Style for tab/navigation labels
- */
-val TabLabelStyle = TextStyle(
-    fontFamily = BbhHegartyFamily,
-    fontWeight = FontWeight.Normal,
-    fontSize = 14.sp,
-    lineHeight = 18.sp,
-    letterSpacing = 1.sp
-)
 
 /**
  * Style for section headers

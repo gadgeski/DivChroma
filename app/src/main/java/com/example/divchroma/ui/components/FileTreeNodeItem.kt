@@ -43,7 +43,6 @@ import com.example.divchroma.ui.theme.FileTreeItemStyle
 import com.example.divchroma.ui.theme.FolderColor
 import com.example.divchroma.ui.theme.NeonEmerald
 import com.example.divchroma.ui.theme.TextPrimary
-import com.example.divchroma.ui.theme.TextSecondary
 
 /**
  * FileTreeNodeItem - Represents a single node in the file tree
@@ -91,7 +90,7 @@ fun FileTreeNodeItem(
                         }
                         onNodeClick(node)
                     }
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Expand/Collapse arrow for directories
@@ -127,7 +126,7 @@ fun FileTreeNodeItem(
                 Text(
                     text = node.name,
                     style = if (node.isDirectory) FileTreeFolderStyle else FileTreeItemStyle,
-                    color = if (node.isDirectory) TextPrimary else TextSecondary
+                    color = TextPrimary
                 )
             }
         }

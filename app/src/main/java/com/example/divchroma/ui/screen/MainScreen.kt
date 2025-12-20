@@ -8,15 +8,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.divchroma.data.SampleFileTree
@@ -24,7 +21,6 @@ import com.example.divchroma.data.SampleProjects
 import com.example.divchroma.ui.components.CircuitBackground
 import com.example.divchroma.ui.components.FileTree
 import com.example.divchroma.ui.components.ProjectSidebar
-import com.example.divchroma.ui.theme.AppTitleStyle
 import com.example.divchroma.ui.theme.DivChromaTheme
 
 /**
@@ -41,22 +37,8 @@ fun MainScreen(
     
     CircuitBackground(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // App Title Header - Neon Glow Effect
-            Text(
-                text = "DivChroma",
-                style = AppTitleStyle.copy(
-                    shadow = Shadow(
-                        color = Color(0xFF00FFCC).copy(alpha = 0.6f),
-                        blurRadius = 12f
-                    )
-                ),
-                color = Color(0xFF00FFCC), // Neon Cyan
-                modifier = Modifier.padding(
-                    start = 16.dp,
-                    top = 16.dp,
-                    bottom = 8.dp
-                )
-            )
+            // App Title removed as per hierarchy cleanup
+
             
             Row(modifier = Modifier.fillMaxSize()) {
                 // Left Sidebar - Project Tabs

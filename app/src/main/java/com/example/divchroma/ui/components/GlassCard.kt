@@ -36,34 +36,44 @@ import com.example.divchroma.ui.theme.TextPrimary
 fun GlassCard(
     modifier: Modifier = Modifier,
     isActive: Boolean = false,
-    borderWidth: Dp = 1.dp,
+    borderWidth: Dp = 0.5.dp,
     cornerRadius: Dp = 8.dp,
     content: @Composable BoxScope.() -> Unit
 ) {
     val shape = RoundedCornerShape(cornerRadius)
     
-    // Glass surface color - uses GlassSurface for glassmorphism effect
-    val surfaceColor = if (isActive) {
-        GlassSurface.copy(alpha = 0.4f) // More visible when active
+    // Glass surface with subtle vertical gradient for depth
+    val surfaceBrush = if (isActive) {
+        Brush.verticalGradient(
+            colors = listOf(
+                GlassSurface.copy(alpha = 0.6f),
+                GlassSurface.copy(alpha = 0.4f)
+            )
+        )
     } else {
-        GlassSurface // Semi-transparent dark glass
+        Brush.verticalGradient(
+            colors = listOf(
+                GlassSurface.copy(alpha = 0.4f), // Boosted from original
+                GlassSurface.copy(alpha = 0.7f)  // Darker at bottom for text contrast
+            )
+        )
     }
     
-    // Border gradient - ActiveGlow for selected, GlassBorder for inactive
+    // Shiny Metallic Border Gradient
     val borderBrush = if (isActive) {
         Brush.verticalGradient(
             colors = listOf(
-                ActiveGlow.copy(alpha = 0.8f),
-                ActiveGlow.copy(alpha = 0.3f),
+                ActiveGlow,
+                ActiveGlow.copy(alpha = 0.5f),
                 ActiveGlow.copy(alpha = 0.1f)
             )
         )
     } else {
         Brush.verticalGradient(
             colors = listOf(
-                GlassBorder,
-                GlassBorder.copy(alpha = 0.3f),
-                Color.Transparent
+                Color.White.copy(alpha = 0.6f), // Metallic Top Highlight
+                GlassBorder, // Mid tone
+                Color.Transparent // Fade out at bottom
             )
         )
     }
@@ -71,7 +81,7 @@ fun GlassCard(
     Box(
         modifier = modifier
             .clip(shape)
-            .background(surfaceColor)
+            .background(surfaceBrush)
             .border(
                 width = borderWidth,
                 brush = borderBrush,
