@@ -12,7 +12,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.divchroma.R
-import com.example.divchroma.ui.theme.CircuitBackground
 import com.example.divchroma.ui.theme.DivChromaTheme
 
 /**
@@ -27,7 +26,14 @@ fun CircuitBackground(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(CircuitBackground)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF003333), // Brighter Deep Teal (Light Source)
+                        Color.Black
+                    )
+                )
+            )
     ) {
         // Circuit pattern overlay
         CircuitPatternOverlay(
@@ -60,8 +66,8 @@ private fun CircuitPatternOverlay(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color.Black.copy(alpha = 0.9f), // Top: Dark for readability
-                            Color.Black.copy(alpha = 0.4f)  // Bottom: Reveal circuit
+                            Color.Transparent, // Top: Reveal Teal Light Source
+                            Color.Black.copy(alpha = 0.9f)  // Bottom: Heavy anchor
                         )
                     )
                 )
