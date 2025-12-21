@@ -22,8 +22,8 @@ val CircuitSurface = Color(0xFF0A0A0A)
 
 
 // Glass Effect Colors
-val GlassSurface = Color(0x1A1A1A30)  // Semi-transparent dark
-val GlassBorder = Color(0x3300FF9D)    // Semi-transparent neon
+val GlassSurface = Color(0xFF001100).copy(alpha = 0.5f) // Deep Bio-Synth Green
+val GlassBorder = Color(0xFF00FF9D).copy(alpha = 0.3f)  // Semi-transparent neon
 val GlassHighlight = Color(0x1A00FF9D)
 
 // Text Colors

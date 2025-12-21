@@ -1,5 +1,6 @@
 package com.example.divchroma.ui.screen
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,7 +33,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -101,18 +104,29 @@ fun MainScreen(
             },
             bottomBar = {
                 NavigationBar(
-                    containerColor = Color(0xFF0A0A0A).copy(alpha = 0.9f),
-                    contentColor = NeonEmerald
+                    containerColor = Color(0xFF00221C), // Calm Deep Green
+                    modifier = Modifier.border(
+                        width = 1.dp,
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                NeonEmerald.copy(alpha = 0.3f),
+                                Color.Transparent
+                            )
+                        ),
+                        shape = RectangleShape
+                    )
                 ) {
                     NavigationBarItem(
+                        icon = { Icon(Icons.Default.Folder, contentDescription = "Files") },
+                        label = { Text("Files") },
                         selected = true,
                         onClick = { },
-                        icon = { Icon(Icons.Default.Folder, null) },
-                        label = { Text("Files") },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = NeonEmerald,
                             selectedTextColor = NeonEmerald,
-                            indicatorColor = DeepMetallic
+                            indicatorColor = NeonEmerald.copy(alpha = 0.2f),
+                            unselectedIconColor = Color.Gray,
+                            unselectedTextColor = Color.Gray
                         )
                     )
                     NavigationBarItem(

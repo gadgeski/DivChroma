@@ -56,13 +56,15 @@ fun ProjectSidebar(
         modifier = modifier
             .width(64.dp)
             .fillMaxHeight()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        CircuitSurface,
-                        Color(0xFF080808)
-                    )
-                )
+            .padding(start = 12.dp, top = 24.dp, bottom = 24.dp) // Floating Capsule
+            .clip(RoundedCornerShape(24.dp))
+            .background(Color.Black.copy(alpha = 0.4f)) // Semi-transparent dark
+            .border(
+                width = 1.dp,
+                brush = Brush.verticalGradient(
+                    colors = listOf(NeonEmerald.copy(alpha = 0.5f), Color.Transparent)
+                ),
+                shape = RoundedCornerShape(24.dp)
             )
             .padding(vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,

@@ -43,37 +43,38 @@ fun GlassCard(
     val shape = RoundedCornerShape(cornerRadius)
     
     // Glass surface with subtle vertical gradient for depth
+    // Bio-Synth Glass Surface
     val surfaceBrush = if (isActive) {
         Brush.verticalGradient(
             colors = listOf(
-                GlassSurface.copy(alpha = 0.6f),
-                GlassSurface.copy(alpha = 0.4f)
+                GlassSurface.copy(alpha = 0.7f),
+                GlassSurface.copy(alpha = 0.5f)
             )
         )
     } else {
         Brush.verticalGradient(
             colors = listOf(
-                GlassSurface.copy(alpha = 0.4f), // Boosted from original
-                GlassSurface.copy(alpha = 0.7f)  // Darker at bottom for text contrast
+                GlassSurface,          // Deep semi-transparent green
+                GlassSurface.copy(alpha = 0.8f) // Darker bottom
             )
         )
     }
     
-    // Shiny Metallic Border Gradient
+    // Bio-Synth Glass Edge Border
     val borderBrush = if (isActive) {
         Brush.verticalGradient(
             colors = listOf(
                 ActiveGlow,
-                ActiveGlow.copy(alpha = 0.5f),
-                ActiveGlow.copy(alpha = 0.1f)
+                GlassBorder.copy(alpha = 0.5f),
+                Color.Transparent
             )
         )
     } else {
         Brush.verticalGradient(
             colors = listOf(
-                Color.White.copy(alpha = 0.6f), // Metallic Top Highlight
-                GlassBorder, // Mid tone
-                Color.Transparent // Fade out at bottom
+                GlassBorder.copy(alpha = 0.8f), // Top: Bright Neon Green (Glass Edge)
+                GlassBorder.copy(alpha = 0.2f), // Mid
+                Color.Transparent // Bottom: Transparent
             )
         )
     }

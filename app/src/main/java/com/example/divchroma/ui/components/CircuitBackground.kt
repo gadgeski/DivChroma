@@ -50,44 +50,13 @@ private fun CircuitPatternOverlay(
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
-        // 1. The Circuit Image Texture
+        // 1. The Circuit Image Texture - Clean & Bright
         Image(
             painter = painterResource(id = R.drawable.circuit_bg),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
-            alpha = 0.4f // Adjust opacity to blend with dark background
-        )
-
-        // 2. Scrim (Gradient)
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent, // Top: Reveal Teal Light Source
-                            Color.Black.copy(alpha = 0.9f)  // Bottom: Heavy anchor
-                        )
-                    )
-                )
-        )
-
-        // 3. The Vignette Effect (Deep Dive)
-        // Center is transparent (shows circuit), Edges are solid black
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            Color.Black.copy(alpha = 0.8f),
-                            Color.Black
-                        ),
-                        radius = 1200f // Adjust based on expected screen size or use local density
-                    )
-                )
+            alpha = 1.0f // Full opacity for the new bright image
         )
     }
 }
