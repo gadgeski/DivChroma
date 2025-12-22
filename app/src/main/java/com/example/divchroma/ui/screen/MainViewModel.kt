@@ -7,6 +7,7 @@ import com.example.divchroma.data.FileRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
@@ -18,11 +19,25 @@ class MainViewModel : ViewModel() {
     private val _currentPath = MutableStateFlow("")
     val currentPath: StateFlow<String> = _currentPath.asStateFlow()
 
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
     private val _files = MutableStateFlow(emptyList<FileItem>())
-    val files: StateFlow<List<FileItem>> = _files.asStateFlow()
+    // filteredFiles depends on _files and _searchQuery
+    val files: StateFlow<List<FileItem>> = kotlinx.coroutines.flow.combine(_files, _searchQuery) { files, query ->
+        if (query.isEmpty()) {
+            files
+        } else {
+            files.filter { it.name.contains(query, ignoreCase = true) }
+        }
+    }.stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), emptyList())
 
     init {
         loadFiles()
+    }
+
+    fun onSearchQueryChange(query: String) {
+        _searchQuery.value = query
     }
 
     /**

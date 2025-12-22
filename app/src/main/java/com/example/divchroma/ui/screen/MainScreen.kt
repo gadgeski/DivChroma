@@ -2,6 +2,7 @@ package com.example.divchroma.ui.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,15 +16,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +55,7 @@ import com.example.divchroma.ui.components.GlassCard
 import com.example.divchroma.ui.components.ProjectSidebar
 import com.example.divchroma.ui.theme.DeepMetallic
 import com.example.divchroma.ui.theme.DivChromaTheme
+import com.example.divchroma.ui.theme.GlassBorder
 import com.example.divchroma.ui.theme.NeonEmerald
 import com.example.divchroma.ui.theme.SectionHeaderStyle
 import com.example.divchroma.ui.theme.TextPrimary
@@ -69,6 +76,8 @@ fun MainScreen(
     var selectedProjectId by remember { mutableStateOf("proj1") }
     val files by viewModel.files.collectAsState()
     val context = androidx.compose.ui.platform.LocalContext.current
+    val isSearchVisible = rememberSaveable { mutableStateOf(false) }
+    val searchQuery by viewModel.searchQuery.collectAsState()
     
     // Map FileItems to FileNodes for the UI
     val fileNodes = remember(files) {
@@ -141,8 +150,12 @@ fun MainScreen(
                         )
                     )
                     NavigationBarItem(
-                        selected = false,
-                        onClick = { },
+                        selected = isSearchVisible.value,
+                        // .value を追加
+                        onClick = {
+                            // 下記に.value をつけることで、IDEに「読んでるし書いてるよ！」と伝えます。
+                            isSearchVisible.value = !isSearchVisible.value
+                        },
                         icon = { Icon(Icons.Default.Search, null) },
                         label = { Text("Search") },
                         colors = NavigationBarItemDefaults.colors(
@@ -189,6 +202,51 @@ fun MainScreen(
                     // Dashboard Header
                     DashboardHeader()
                     
+                    // Address Bar (Breadcrumbs)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        val displayPath = if (currentPath.isEmpty()) "> root" else "> ...${currentPath.takeLast(30)}"
+                        Text(
+                            text = displayPath,
+                            color = NeonEmerald,
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                            fontSize = 14.sp
+                        )
+                    }
+
+                    // Search Bar
+                    if (isSearchVisible.value) {
+                         OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { viewModel.onSearchQueryChange(it) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            placeholder = { Text("Search files...", color = Color.Gray) },
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = NeonEmerald,
+                                unfocusedTextColor = TextPrimary,
+                                focusedContainerColor = Color.Black.copy(alpha = 0.5f),
+                                unfocusedContainerColor = Color.Black.copy(alpha = 0.3f),
+                                focusedBorderColor = NeonEmerald,
+                                unfocusedBorderColor = GlassBorder
+                            ),
+                            trailingIcon = {
+                                IconButton(onClick = { 
+                                    viewModel.onSearchQueryChange("")
+                                    isSearchVisible.value = false
+                                }) {
+                                    Icon(Icons.Default.Close, contentDescription = "Close Search", tint = NeonEmerald)
+                                }
+                            }
+                        )
+                    }
+
                     // File Tree Content
                     Box(
                         modifier = Modifier
