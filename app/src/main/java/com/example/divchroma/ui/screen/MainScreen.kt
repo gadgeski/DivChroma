@@ -1,5 +1,6 @@
 package com.example.divchroma.ui.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -67,6 +68,7 @@ fun MainScreen(
 ) {
     var selectedProjectId by remember { mutableStateOf("proj1") }
     val files by viewModel.files.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
     
     // Map FileItems to FileNodes for the UI
     val fileNodes = remember(files) {
@@ -81,6 +83,15 @@ fun MainScreen(
         }
     }
     
+    // Back Handling - Valid implementation
+    // Navigate up if not at root
+    val currentPath by viewModel.currentPath.collectAsState()
+    val isRoot = currentPath.isEmpty() || currentPath == android.os.Environment.getExternalStorageDirectory().path
+    
+    BackHandler(enabled = !isRoot) {
+        viewModel.navigateUp()
+    }
+
     CircuitBackground(modifier = modifier.fillMaxSize()) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -190,7 +201,12 @@ fun MainScreen(
                             nodes = fileNodes,
                             modifier = Modifier.padding(bottom = 80.dp), // Check FAB overlap
                             onNodeClick = { node ->
-                                println("DivChroma: Selected ${node.name}")
+                                if (node.isDirectory) {
+                                    viewModel.navigateTo(node.id) // node.id holds path
+                                } else {
+                                    // Open file
+                                    com.example.divchroma.utils.FileOpener.openFile(context, java.io.File(node.id))
+                                }
                             }
                         )
                     }
