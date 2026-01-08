@@ -1,4 +1,4 @@
-package com.example.divchroma
+package com.gadgeski.divchroma
 
 import android.graphics.Color
 import android.os.Bundle
@@ -12,8 +12,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.divchroma.ui.screen.MainScreen
-import com.example.divchroma.ui.theme.DivChromaTheme
+import com.gadgeski.divchroma.ui.screen.MainScreen
+import com.gadgeski.divchroma.ui.theme.DivChromaTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

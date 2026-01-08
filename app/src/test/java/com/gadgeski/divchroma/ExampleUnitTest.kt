@@ -1,4 +1,4 @@
-package com.example.divchroma
+package com.gadgeski.divchroma
 
 import org.junit.Test
 

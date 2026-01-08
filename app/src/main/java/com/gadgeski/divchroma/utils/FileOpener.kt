@@ -1,4 +1,4 @@
-package com.example.divchroma.utils
+package com.gadgeski.divchroma.utils
 
 import android.content.ActivityNotFoundException
 import android.content.Context

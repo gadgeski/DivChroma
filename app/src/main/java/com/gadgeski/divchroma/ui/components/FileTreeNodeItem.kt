@@ -1,4 +1,4 @@
-package com.example.divchroma.ui.components
+package com.gadgeski.divchroma.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -33,16 +33,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.divchroma.data.FileNode
-import com.example.divchroma.data.SampleFileTree
-import com.example.divchroma.ui.theme.CodeFileColor
-import com.example.divchroma.ui.theme.DivChromaTheme
-import com.example.divchroma.ui.theme.FileColor
-import com.example.divchroma.ui.theme.FileTreeFolderStyle
-import com.example.divchroma.ui.theme.FileTreeItemStyle
-import com.example.divchroma.ui.theme.FolderColor
-import com.example.divchroma.ui.theme.NeonEmerald
-import com.example.divchroma.ui.theme.TextPrimary
+import com.gadgeski.divchroma.data.FileNode
+import com.gadgeski.divchroma.data.SampleFileTree
+import com.gadgeski.divchroma.ui.theme.CodeFileColor
+import com.gadgeski.divchroma.ui.theme.DivChromaTheme
+import com.gadgeski.divchroma.ui.theme.FileColor
+import com.gadgeski.divchroma.ui.theme.FileTreeFolderStyle
+import com.gadgeski.divchroma.ui.theme.FileTreeItemStyle
+import com.gadgeski.divchroma.ui.theme.FolderColor
+import com.gadgeski.divchroma.ui.theme.NeonEmerald
+import com.gadgeski.divchroma.ui.theme.TextPrimary
 
 /**
  * FileTreeNodeItem - Represents a single node in the file tree

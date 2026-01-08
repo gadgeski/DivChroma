@@ -1,4 +1,4 @@
-package com.example.divchroma.ui.components
+package com.gadgeski.divchroma.ui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -27,16 +27,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.divchroma.data.ProjectTab
-import com.example.divchroma.data.SampleProjects
-import com.example.divchroma.ui.theme.ActiveGlow
-import com.example.divchroma.ui.theme.CircuitSurface
-import com.example.divchroma.ui.theme.DarkMetallicGreen
-import com.example.divchroma.ui.theme.DivChromaTheme
-import com.example.divchroma.ui.theme.InactiveState
-import com.example.divchroma.ui.theme.NeonEmerald
-import com.example.divchroma.ui.theme.SectionHeaderStyle
-import com.example.divchroma.ui.theme.TextMuted
+import com.gadgeski.divchroma.data.ProjectTab
+import com.gadgeski.divchroma.data.SampleProjects
+import com.gadgeski.divchroma.ui.theme.ActiveGlow
+import com.gadgeski.divchroma.ui.theme.DarkMetallicGreen
+import com.gadgeski.divchroma.ui.theme.DivChromaTheme
+import com.gadgeski.divchroma.ui.theme.InactiveState
+import com.gadgeski.divchroma.ui.theme.NeonEmerald
+import com.gadgeski.divchroma.ui.theme.SectionHeaderStyle
+import com.gadgeski.divchroma.ui.theme.TextMuted
 
 /**
  * ProjectSidebar - Narrow vertical sidebar for project tabs

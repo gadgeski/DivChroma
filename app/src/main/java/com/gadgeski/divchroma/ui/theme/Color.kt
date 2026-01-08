@@ -1,4 +1,4 @@
-package com.example.divchroma.ui.theme
+package com.gadgeski.divchroma.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

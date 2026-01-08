@@ -1,4 +1,4 @@
-package com.example.divchroma.ui.screen
+package com.gadgeski.divchroma.ui.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.border
@@ -47,20 +47,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.divchroma.data.FileNode
-import com.example.divchroma.data.SampleProjects
-import com.example.divchroma.ui.components.CircuitBackground
-import com.example.divchroma.ui.components.FileTree
-import com.example.divchroma.ui.components.GlassCard
-import com.example.divchroma.ui.components.ProjectSidebar
-import com.example.divchroma.ui.theme.DeepMetallic
-import com.example.divchroma.ui.theme.DivChromaTheme
-import com.example.divchroma.ui.theme.GlassBorder
-import com.example.divchroma.ui.theme.NeonEmerald
-import com.example.divchroma.ui.theme.SectionHeaderStyle
-import com.example.divchroma.ui.theme.TextPrimary
-import com.example.divchroma.ui.theme.TextSecondary
-import com.example.divchroma.ui.theme.Typography
+import com.gadgeski.divchroma.data.FileNode
+import com.gadgeski.divchroma.data.SampleProjects
+import com.gadgeski.divchroma.ui.components.CircuitBackground
+import com.gadgeski.divchroma.ui.components.FileTree
+import com.gadgeski.divchroma.ui.components.GlassCard
+import com.gadgeski.divchroma.ui.components.ProjectSidebar
+import com.gadgeski.divchroma.ui.theme.DeepMetallic
+import com.gadgeski.divchroma.ui.theme.DivChromaTheme
+import com.gadgeski.divchroma.ui.theme.GlassBorder
+import com.gadgeski.divchroma.ui.theme.NeonEmerald
+import com.gadgeski.divchroma.ui.theme.SectionHeaderStyle
+import com.gadgeski.divchroma.ui.theme.TextPrimary
+import com.gadgeski.divchroma.ui.theme.TextSecondary
+import com.gadgeski.divchroma.ui.theme.Typography
 
 /**
  * MainScreen - Primary UI layout for DivChroma
@@ -263,7 +263,7 @@ fun MainScreen(
                                     viewModel.navigateTo(node.id) // node.id holds path
                                 } else {
                                     // Open file
-                                    com.example.divchroma.utils.FileOpener.openFile(context, java.io.File(node.id))
+                                    com.gadgeski.divchroma.utils.FileOpener.openFile(context, java.io.File(node.id))
                                 }
                             }
                         )

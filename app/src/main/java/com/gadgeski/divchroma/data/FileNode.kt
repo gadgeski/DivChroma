@@ -1,4 +1,4 @@
-package com.example.divchroma.data
+package com.gadgeski.divchroma.data
 
 /**
  * DivChroma File Tree Data Model

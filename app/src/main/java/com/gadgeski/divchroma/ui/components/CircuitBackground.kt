@@ -1,4 +1,4 @@
-package com.example.divchroma.ui.components
+package com.gadgeski.divchroma.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -11,8 +11,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.divchroma.R
-import com.example.divchroma.ui.theme.DivChromaTheme
+import com.gadgeski.divchroma.R
+import com.gadgeski.divchroma.ui.theme.DivChromaTheme
 
 /**
  * CircuitBackground - PCB (Printed Circuit Board) style background pattern

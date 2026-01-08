@@ -1,9 +1,9 @@
-package com.example.divchroma.ui.screen
+package com.gadgeski.divchroma.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.divchroma.data.FileItem
-import com.example.divchroma.data.FileRepository
+import com.gadgeski.divchroma.data.FileItem
+import com.gadgeski.divchroma.data.FileRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

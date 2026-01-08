@@ -1,4 +1,4 @@
-package com.example.divchroma.ui.components
+package com.gadgeski.divchroma.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,13 +17,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.divchroma.ui.theme.ActiveGlow
-import com.example.divchroma.ui.theme.DivChromaTheme
-import com.example.divchroma.ui.theme.GlassBorder
-import com.example.divchroma.ui.theme.GlassHighlight
-import com.example.divchroma.ui.theme.GlassSurface
-import com.example.divchroma.ui.theme.NeonEmerald
-import com.example.divchroma.ui.theme.TextPrimary
+import com.gadgeski.divchroma.ui.theme.ActiveGlow
+import com.gadgeski.divchroma.ui.theme.DivChromaTheme
+import com.gadgeski.divchroma.ui.theme.GlassBorder
+import com.gadgeski.divchroma.ui.theme.GlassHighlight
+import com.gadgeski.divchroma.ui.theme.GlassSurface
+import com.gadgeski.divchroma.ui.theme.NeonEmerald
+import com.gadgeski.divchroma.ui.theme.TextPrimary
 
 /**
  * GlassCard - Glassmorphism styled card component

@@ -1,4 +1,4 @@
-package com.example.divchroma.data
+package com.gadgeski.divchroma.data
 
 /**
  * FileItem - Data class representing a file in the system
