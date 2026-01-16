@@ -8,53 +8,67 @@ DivChroma/
 │       ├── androidTest
 │       │   └── java
 │       │       └── com
-│       │           └── example
+│       │           └── gadgeski
 │       │               └── divchroma
 │       │                   └── ExampleInstrumentedTest.kt
 │       ├── main
 │       │   ├── AndroidManifest.xml
+│       │   ├── ic_launcher-playstore.png
 │       │   ├── java
 │       │   │   └── com
-│       │   │       └── example
+│       │   │       └── gadgeski
 │       │   │           └── divchroma
 │       │   │               ├── MainActivity.kt
 │       │   │               ├── data
-│       │   │               │   └── FileNode.kt
-│       │   │               └── ui
-│       │   │                   ├── components
-│       │   │                   │   ├── CircuitBackground.kt
-│       │   │                   │   ├── FileTreeNodeItem.kt
-│       │   │                   │   ├── GlassCard.kt
-│       │   │                   │   └── ProjectSidebar.kt
-│       │   │                   ├── screen
-│       │   │                   │   └── MainScreen.kt
-│       │   │                   └── theme
-│       │   │                       ├── Color.kt
-│       │   │                       ├── Theme.kt
-│       │   │                       └── Type.kt
+│       │   │               │   ├── FileItem.kt
+│       │   │               │   ├── FileNode.kt
+│       │   │               │   └── FileRepository.kt
+│       │   │               ├── ui
+│       │   │               │   ├── components
+│       │   │               │   │   ├── CircuitBackground.kt
+│       │   │               │   │   ├── FileTreeNodeItem.kt
+│       │   │               │   │   ├── GlassCard.kt
+│       │   │               │   │   └── ProjectSidebar.kt
+│       │   │               │   ├── screen
+│       │   │               │   │   ├── MainScreen.kt
+│       │   │               │   │   └── MainViewModel.kt
+│       │   │               │   └── theme
+│       │   │               │       ├── Color.kt
+│       │   │               │       ├── Theme.kt
+│       │   │               │       └── Type.kt
+│       │   │               └── utils
+│       │   │                   ├── EcoSystemLauncher.kt
+│       │   │                   └── FileOpener.kt
 │       │   └── res
 │       │       ├── drawable
+│       │       │   ├── circuit_bg.png
 │       │       │   ├── ic_launcher_background.xml
 │       │       │   └── ic_launcher_foreground.xml
 │       │       ├── font
 │       │       │   └── bbhhegarty_regular.ttf
 │       │       ├── mipmap-anydpi
+│       │       ├── mipmap-anydpi-v26
 │       │       │   ├── ic_launcher.xml
 │       │       │   └── ic_launcher_round.xml
 │       │       ├── mipmap-hdpi
 │       │       │   ├── ic_launcher.webp
+│       │       │   ├── ic_launcher_foreground.webp
 │       │       │   └── ic_launcher_round.webp
 │       │       ├── mipmap-mdpi
 │       │       │   ├── ic_launcher.webp
+│       │       │   ├── ic_launcher_foreground.webp
 │       │       │   └── ic_launcher_round.webp
 │       │       ├── mipmap-xhdpi
 │       │       │   ├── ic_launcher.webp
+│       │       │   ├── ic_launcher_foreground.webp
 │       │       │   └── ic_launcher_round.webp
 │       │       ├── mipmap-xxhdpi
 │       │       │   ├── ic_launcher.webp
+│       │       │   ├── ic_launcher_foreground.webp
 │       │       │   └── ic_launcher_round.webp
 │       │       ├── mipmap-xxxhdpi
 │       │       │   ├── ic_launcher.webp
+│       │       │   ├── ic_launcher_foreground.webp
 │       │       │   └── ic_launcher_round.webp
 │       │       ├── values
 │       │       │   ├── colors.xml
@@ -62,11 +76,12 @@ DivChroma/
 │       │       │   └── themes.xml
 │       │       └── xml
 │       │           ├── backup_rules.xml
-│       │           └── data_extraction_rules.xml
+│       │           ├── data_extraction_rules.xml
+│       │           └── provider_paths.xml
 │       └── test
 │           └── java
 │               └── com
-│                   └── example
+│                   └── gadgeski
 │                       └── divchroma
 │                           └── ExampleUnitTest.kt
 ├── build.gradle.kts
@@ -81,5 +96,5 @@ DivChroma/
 ├── local.properties
 └── settings.gradle.kts
 
-36 directories, 45 files
+38 directories, 58 files
 ```
