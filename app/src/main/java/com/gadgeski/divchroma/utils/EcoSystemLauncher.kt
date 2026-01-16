@@ -43,7 +43,7 @@ object EcoSystemLauncher {
                 // これにより「BugCodexというアプリ宛て」であることが確定します。
                 setPackage(PACKAGE_BUGCODEX)
             }
-            
+
             // 起動を試みる
             context.startActivity(intent)
 
