@@ -10,12 +10,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Search
@@ -200,7 +204,14 @@ fun MainScreen(
                         .fillMaxHeight()
                 ) {
                     // Dashboard Header
-                    DashboardHeader()
+                    DashboardHeader(
+                        onLaunchBugCodex = {
+                            // 現在のプロジェクト（サイドバーで選択中）の名前を取得して投げる
+                            // ※SampleProjectsの運用に合わせて、選択中のIDから名前を引くロジックを入れるとベストですが、
+                            // まずは「現在開いているフォルダ」ベースの launchBugCodex を呼びます。
+                            viewModel.launchBugCodex(context)
+                        }
+                    )
                     
                     // Address Bar (Breadcrumbs)
                     Row(
@@ -275,12 +286,17 @@ fun MainScreen(
 }
 
 @Composable
-fun DashboardHeader() {
+fun DashboardHeader(
+    modifier: Modifier = Modifier,
+    onLaunchBugCodex: () -> Unit = {}
+// ★ New: コールバックを追加
+) {
     GlassCard(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(16.dp),
-        isActive = true, // Force active style for glow
+        isActive = true,
+        // Force active style for glow
         cornerRadius = 12.dp,
         borderWidth = 1.dp
     ) {
@@ -304,19 +320,43 @@ fun DashboardHeader() {
                     color = TextPrimary
                 )
             }
-            
+
+            // 右側の情報カラム
             Column(horizontalAlignment = Alignment.End) {
-                 Text(
+                // 既存のファイル数表示
+                Text(
                     text = "TOTAL FILES",
-                    style = SectionHeaderStyle, // Using SectionHeader for labels
+                    style = SectionHeaderStyle,
                     color = TextSecondary,
                     fontSize = 10.sp
                 )
-                 Text(
+                Text(
                     text = "12",
-                     style = Typography.titleLarge,
-                     color = TextPrimary
+                    style = Typography.titleLarge,
+                    color = TextPrimary
                 )
+
+                // ★ New: BugCodex 起動ボタン
+                // 少しスペースを開けて配置
+                androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(top = 8.dp))
+
+                androidx.compose.material3.FilledTonalButton(
+                    onClick = onLaunchBugCodex,
+                    colors = androidx.compose.material3.ButtonDefaults.filledTonalButtonColors(
+                        containerColor = NeonEmerald.copy(alpha = 0.2f),
+                        contentColor = NeonEmerald
+                    ),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                    modifier = Modifier.height(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.BugReport,
+                        contentDescription = "Open BugCodex",
+                        modifier = Modifier.size(16.dp)
+                    )
+                    androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(8.dp))
+                    Text("BUGS", fontSize = 12.sp)
+                }
             }
         }
     }
