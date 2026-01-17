@@ -26,7 +26,7 @@ object FileOpener {
             }
 
             context.startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
+        } catch (_: ActivityNotFoundException) {
             Toast.makeText(context, "No app found to open this file", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Toast.makeText(context, "Error opening file: ${e.message}", Toast.LENGTH_SHORT).show()
