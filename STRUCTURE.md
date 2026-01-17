@@ -18,6 +18,7 @@ DivChroma/
 │       │   │   └── com
 │       │   │       └── gadgeski
 │       │   │           └── divchroma
+│       │   │               ├── DivChromaApplication.kt
 │       │   │               ├── MainActivity.kt
 │       │   │               ├── data
 │       │   │               │   ├── FileItem.kt
@@ -96,5 +97,5 @@ DivChroma/
 ├── local.properties
 └── settings.gradle.kts
 
-38 directories, 58 files
+38 directories, 59 files
 ```
