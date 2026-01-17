@@ -30,6 +30,9 @@ DivChroma/
 │       │   │               │   │   ├── FileTreeNodeItem.kt
 │       │   │               │   │   ├── GlassCard.kt
 │       │   │               │   │   └── ProjectSidebar.kt
+│       │   │               │   ├── navigation
+│       │   │               │   │   ├── NavGraph.kt
+│       │   │               │   │   └── Screen.kt
 │       │   │               │   ├── screen
 │       │   │               │   │   ├── MainScreen.kt
 │       │   │               │   │   └── MainViewModel.kt
@@ -97,5 +100,5 @@ DivChroma/
 ├── local.properties
 └── settings.gradle.kts
 
-38 directories, 59 files
+39 directories, 61 files
 ```
