@@ -2,17 +2,20 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    // HiltとKSPプラグインを適用
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
     namespace = "com.gadgeski.divchroma"
-    compileSdk {
-        version = release(36)
-    }
+    // 警告解消: 最新のSDK 36を使用します
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.gadgeski.divchroma"
         minSdk = 34
+        // 警告解消: ターゲットも36に合わせます
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -52,6 +55,11 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
+
+    // Hilt Integration
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

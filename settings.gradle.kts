@@ -1,12 +1,7 @@
 pluginManagement {
     repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
+        // HiltやKSPの依存関係を正しく解決するため、制限(contentブロック)を撤廃します
+        google()
         mavenCentral()
         gradlePluginPortal()
     }
