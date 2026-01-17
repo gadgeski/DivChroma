@@ -3,4 +3,8 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
+
+    // ↓ HiltとKSPのプラグインをここで宣言します (apply falseは必須です)
+    alias(libs.plugins.hilt) apply false
+    alias(libs.plugins.ksp) apply false
 }
