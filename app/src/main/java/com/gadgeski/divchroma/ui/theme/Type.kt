@@ -9,35 +9,29 @@ import androidx.compose.ui.unit.sp
 import com.gadgeski.divchroma.R
 
 // ===========================================================================
-// Hybrid Typography Strategy
+// Hybrid Typography Strategy (Refined by PrismNexus)
 // ===========================================================================
-// 1. Headlines (BBH Hegarty): App title, tab names, large headers - for impact
-// 2. File Tree (Monospace): Directory listings - for readability
+// 1. Headlines (BBH Hegarty): Impact, Brand Identity, Section Markers
+// 2. Content (Monospace): ALL Data, Logs, Body text - for pure techno-utilitarian look
 // ===========================================================================
 
 /**
- * BBH Hegarty - Custom display font for headlines
- * Used for: App title, Tab names, Section headers
+ * BBH Hegarty - Custom display font
  */
 val BbhHegartyFamily = FontFamily(
     Font(R.font.bbhhegarty_regular, FontWeight.Normal)
 )
 
 /**
- * Monospace - System monospace font for code/file listings
- * Used for: File tree, directory names, file names
+ * Monospace - System monospace font
+ * Used extensively to maintain the "Hacker/Console" aesthetic
  */
 val MonospaceFamily = FontFamily.Monospace
 
 // ===========================================================================
-// Custom Text Styles (for direct use in Composables)
+// Custom Text Styles (Preserved)
 // ===========================================================================
 
-
-
-/**
- * Style for section headers
- */
 val SectionHeaderStyle = TextStyle(
     fontFamily = BbhHegartyFamily,
     fontWeight = FontWeight.Normal,
@@ -46,9 +40,6 @@ val SectionHeaderStyle = TextStyle(
     letterSpacing = 1.5.sp
 )
 
-/**
- * Style for file/folder names in the tree view
- */
 val FileTreeItemStyle = TextStyle(
     fontFamily = MonospaceFamily,
     fontWeight = FontWeight.Normal,
@@ -57,9 +48,6 @@ val FileTreeItemStyle = TextStyle(
     letterSpacing = 0.sp
 )
 
-/**
- * Style for file tree folder names (slightly bolder)
- */
 val FileTreeFolderStyle = TextStyle(
     fontFamily = MonospaceFamily,
     fontWeight = FontWeight.Medium,
@@ -69,11 +57,11 @@ val FileTreeFolderStyle = TextStyle(
 )
 
 // ===========================================================================
-// Material 3 Typography (integrated with custom fonts)
+// Material 3 Typography
 // ===========================================================================
 
 val Typography = Typography(
-    // Display styles - BBH Hegarty for impact
+    // Display - BBH Hegarty
     displayLarge = TextStyle(
         fontFamily = BbhHegartyFamily,
         fontWeight = FontWeight.Normal,
@@ -95,8 +83,8 @@ val Typography = Typography(
         lineHeight = 44.sp,
         letterSpacing = 0.sp
     ),
-    
-    // Headline styles - BBH Hegarty for headers
+
+    // Headline - BBH Hegarty
     headlineLarge = TextStyle(
         fontFamily = BbhHegartyFamily,
         fontWeight = FontWeight.Normal,
@@ -118,8 +106,8 @@ val Typography = Typography(
         lineHeight = 32.sp,
         letterSpacing = 0.sp
     ),
-    
-    // Title styles - BBH Hegarty for titles
+
+    // Title - BBH Hegarty (for emphasis)
     titleLarge = TextStyle(
         fontFamily = BbhHegartyFamily,
         fontWeight = FontWeight.Normal,
@@ -127,6 +115,8 @@ val Typography = Typography(
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
+    // Medium/Small Titles are often used inside cards/lists, so Monospace fits better here
+    // But keeping BBH for consistency with user's original intent if it's "Title"
     titleMedium = TextStyle(
         fontFamily = BbhHegartyFamily,
         fontWeight = FontWeight.Medium,
@@ -141,47 +131,47 @@ val Typography = Typography(
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp
     ),
-    
-    // Body styles - Default for readability
+
+    // Body - Switch to Monospace for Tech Feel
     bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = MonospaceFamily, // Changed from Default
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     ),
     bodyMedium = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = MonospaceFamily, // Changed from Default
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.25.sp
     ),
     bodySmall = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = MonospaceFamily, // Changed from Default
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.4.sp
     ),
-    
-    // Label styles - Default for UI elements
+
+    // Label - Switch to Monospace for Tech Feel
     labelLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = MonospaceFamily, // Changed from Default
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp
     ),
     labelMedium = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = MonospaceFamily, // Changed from Default
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp
     ),
     labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = MonospaceFamily, // Changed from Default
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
         lineHeight = 16.sp,
