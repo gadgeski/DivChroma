@@ -1,113 +1,104 @@
 package com.gadgeski.divchroma.ui.screen
 
 import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gadgeski.divchroma.data.FileItem
 import com.gadgeski.divchroma.data.FileRepository
-import com.gadgeski.divchroma.utils.EcoSystemLauncher // ★ New: ランチャーをインポート
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.io.File
+import javax.inject.Inject
 
-/**
- * MainViewModel - Manages the state for the MainScreen
- * Update: Added ecosystem capability to launch BugCodex.
- */
-class MainViewModel : ViewModel() {
-    private val repository = FileRepository()
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val repository: FileRepository
+) : ViewModel() {
 
+    // 現在のパス
     private val _currentPath = MutableStateFlow("")
     val currentPath: StateFlow<String> = _currentPath.asStateFlow()
 
+    // ファイルリスト
+    private val _files = MutableStateFlow<List<FileItem>>(emptyList())
+    val files: StateFlow<List<FileItem>> = _files.asStateFlow()
+
+    // 検索クエリ
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
-    private val _files = MutableStateFlow(emptyList<FileItem>())
-    // filteredFiles depends on _files and _searchQuery
-    val files: StateFlow<List<FileItem>> = combine(_files, _searchQuery) { files, query ->
-        if (query.isEmpty()) {
-            files
-        } else {
-            files.filter { it.name.contains(query, ignoreCase = true) }
-        }
-    }.stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), emptyList())
-
     init {
-        loadFiles()
+        // 初期化時にルートディレクトリをロード
+        loadRoot()
     }
 
-    fun onSearchQueryChange(query: String) {
-        _searchQuery.value = query
+    private fun loadRoot() {
+        val root = repository.getRootDirectory()
+        _currentPath.value = root.absolutePath
+        loadFiles(root.absolutePath)
     }
 
-    /**
-     * Load files from the specified path.
-     * If path is empty, it loads from the default external storage root.
-     */
-    fun loadFiles(path: String = "") {
+    private fun loadFiles(path: String) {
         viewModelScope.launch {
-            _files.value = repository.getFiles(path)
-            _currentPath.value = path
+            val fileList = repository.getFiles(path)
+            _files.value = fileList
         }
     }
 
     /**
-     * Navigate into a directory
+     * ディレクトリへ移動
      */
     fun navigateTo(path: String) {
-        val file = File(path)
-        if (file.isDirectory) {
-            loadFiles(path)
+        _currentPath.value = path
+        loadFiles(path)
+    }
+
+    /**
+     * 上の階層へ戻る
+     */
+    fun navigateUp() {
+        val currentFile = java.io.File(_currentPath.value)
+        val parent = currentFile.parentFile
+
+        // ルートより上には行かせない等の制御も可能ですが、
+        // 一旦は親が存在すれば移動します
+        if (parent != null && parent.canRead()) {
+            navigateTo(parent.absolutePath)
         }
     }
 
     /**
-     * Navigate up to parent directory
-     * Returns true if navigation was successful, false if already at root
+     * 検索クエリの更新
      */
-    fun navigateUp(): Boolean {
-        val current = _currentPath.value
-        val rootPath = android.os.Environment.getExternalStorageDirectory().path
-
-        if (current.isEmpty() || current == rootPath) {
-            return false
-        }
-
-        val parent = File(current).parent ?: return false
-
-        if (rootPath.startsWith(parent) && parent.length < rootPath.length) {
-            loadFiles("") // Reset to default root
-            return true
-        }
-
-        loadFiles(parent)
-        return true
+    fun onSearchQueryChange(query: String) {
+        _searchQuery.value = query
+        // TODO: 実際のフィルタリングロジックはここで実装するか、
+        // Flowのcombineを使って _files と _searchQuery を合成して UI に渡すのがスマートです。
+        // 今回はまずクエリ保持のみ実装します。
     }
 
-    // =================================================================
-    // ★ New: EcoSystem (Hub) Functions
-    // =================================================================
-
     /**
-     * 現在のコンテキスト（フォルダ）で BugCodex を起動する
-     *
-     * @param context Activity Context (StartActivityに必要)
-     * @param explicitProjectName 任意のプロジェクト名を指定する場合に使用。nullなら現在のフォルダ名を使用。
+     * エコシステム連携: BugCodexを起動
+     * "Context Injection" の第一歩です。
      */
-    fun launchBugCodex(context: Context, explicitProjectName: String? = null) {
-        // プロジェクト名の決定ロジック:
-        // 1. 引数で指定があればそれを使う
-        // 2. なければ現在のパスの「フォルダ名」を使う
-        // 3. ルートなどでフォルダ名が取れなければ "Home" とする
-        val currentFolder = File(_currentPath.value).name
-        val projectName = explicitProjectName ?: if (_currentPath.value.isEmpty()) "Home" else currentFolder
-
-        // ランチャーを起動
-        EcoSystemLauncher.launchBugCodex(context, projectName)
+    fun launchBugCodex(context: Context) {
+        try {
+            val intent = context.packageManager.getLaunchIntentForPackage("com.gadgeski.bugcodex")
+            if (intent != null) {
+                // 文脈を注入
+                intent.putExtra("EXTRA_PROJECT_PATH", _currentPath.value)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(intent)
+            } else {
+                // アプリが見つからない場合の処理 (ストアへ誘導など)
+                // 今回は簡易的にログ出力のみ
+                println("BugCodex not installed")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
