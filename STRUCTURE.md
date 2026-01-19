@@ -23,7 +23,8 @@ DivChroma/
 │       │   │               ├── data
 │       │   │               │   ├── FileItem.kt
 │       │   │               │   ├── FileNode.kt
-│       │   │               │   └── FileRepository.kt
+│       │   │               │   ├── FileRepository.kt
+│       │   │               │   └── SampleProjects.kt
 │       │   │               ├── ui
 │       │   │               │   ├── components
 │       │   │               │   │   ├── CircuitBackground.kt
@@ -100,5 +101,5 @@ DivChroma/
 ├── local.properties
 └── settings.gradle.kts
 
-39 directories, 61 files
+39 directories, 62 files
 ```
