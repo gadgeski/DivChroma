@@ -63,6 +63,7 @@ import com.gadgeski.divchroma.data.SampleProjects
 import com.gadgeski.divchroma.ui.components.CircuitBackground
 import com.gadgeski.divchroma.ui.components.FileTree
 import com.gadgeski.divchroma.ui.components.GlassCard
+import com.gadgeski.divchroma.ui.components.PermissionGate
 import com.gadgeski.divchroma.ui.components.ProjectSidebar
 import com.gadgeski.divchroma.ui.theme.DivChromaTheme
 import com.gadgeski.divchroma.ui.theme.GlassBorder
@@ -85,6 +86,20 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = viewModel()
 ) {
+    // ★ PermissionGateでラップ: 権限がない場合はUIを表示せず、警告画面を出す
+    PermissionGate {
+        MainScreenContent(modifier, viewModel)
+    }
+}
+
+/**
+ * 権限取得後に表示される本来のメイン画面
+ */
+@Composable
+private fun MainScreenContent(
+    modifier: Modifier = Modifier,
+    viewModel: MainViewModel = viewModel()
+) {
     // UI State
     var selectedProjectId by remember { mutableStateOf("proj1") }
     val files by viewModel.files.collectAsState()
@@ -100,8 +115,7 @@ fun MainScreen(
                 id = fileItem.path,
                 name = fileItem.name,
                 isDirectory = fileItem.isDirectory,
-                children = emptyList(),
-                // Recursive loading not yet implemented
+                children = emptyList(), // Recursive loading not yet implemented
                 depth = 0
             )
         }
@@ -118,8 +132,7 @@ fun MainScreen(
     CircuitBackground(modifier = modifier.fillMaxSize()) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            containerColor = Color.Transparent,
-            // Transparent to show CircuitBackground
+            containerColor = Color.Transparent, // Transparent to show CircuitBackground
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = { /* Handle Add */ },
@@ -140,8 +153,7 @@ fun MainScreen(
             bottomBar = {
                 // Cyberpunk styled Bottom Bar
                 NavigationBar(
-                    containerColor = Color(0xFF00221C),
-                    // Calm Deep Green
+                    containerColor = Color(0xFF00221C), // Calm Deep Green
                     modifier = Modifier.border(
                         width = 1.dp,
                         brush = Brush.verticalGradient(
