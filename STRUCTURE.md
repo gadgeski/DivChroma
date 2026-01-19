@@ -28,7 +28,7 @@ DivChroma/
 │       │   │               ├── ui
 │       │   │               │   ├── components
 │       │   │               │   │   ├── CircuitBackground.kt
-│       │   │               │   │   ├── FileTreeNodeItem.kt
+│       │   │               │   │   ├── FileTree.kt
 │       │   │               │   │   ├── GlassCard.kt
 │       │   │               │   │   ├── PermissionGate.kt
 │       │   │               │   │   └── ProjectSidebar.kt
@@ -44,7 +44,6 @@ DivChroma/
 │       │   │               │       └── Type.kt
 │       │   │               └── utils
 │       │   │                   ├── ContextLinker.kt
-│       │   │                   ├── EcoSystemLauncher.kt
 │       │   │                   └── FileOpener.kt
 │       │   └── res
 │       │       ├── drawable
@@ -103,5 +102,5 @@ DivChroma/
 ├── local.properties
 └── settings.gradle.kts
 
-39 directories, 64 files
+39 directories, 63 files
 ```
