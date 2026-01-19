@@ -22,7 +22,6 @@ DivChroma/
 │       │   │               ├── MainActivity.kt
 │       │   │               ├── data
 │       │   │               │   ├── FileItem.kt
-│       │   │               │   ├── FileNode.kt
 │       │   │               │   ├── FileRepository.kt
 │       │   │               │   └── SampleProjects.kt
 │       │   │               ├── ui
@@ -30,6 +29,7 @@ DivChroma/
 │       │   │               │   │   ├── CircuitBackground.kt
 │       │   │               │   │   ├── FileTreeNodeItem.kt
 │       │   │               │   │   ├── GlassCard.kt
+│       │   │               │   │   ├── PermissionGate.kt
 │       │   │               │   │   └── ProjectSidebar.kt
 │       │   │               │   ├── navigation
 │       │   │               │   │   ├── NavGraph.kt
