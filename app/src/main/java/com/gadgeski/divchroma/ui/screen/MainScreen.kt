@@ -15,13 +15,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Search
@@ -46,7 +44,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -60,6 +57,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gadgeski.divchroma.data.FileNode
 import com.gadgeski.divchroma.data.SampleProjects
+import com.gadgeski.divchroma.data.SpokeApp
 import com.gadgeski.divchroma.ui.components.CircuitBackground
 import com.gadgeski.divchroma.ui.components.FileTree
 import com.gadgeski.divchroma.ui.components.GlassCard
@@ -77,52 +75,43 @@ import java.io.File
 
 /**
  * MainScreen - Primary UI layout for DivChroma
- * Layout:
- * - Left: ProjectSidebar (narrow vertical strip)
- * - Right: FileTree (main content area)
  */
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = viewModel()
 ) {
-    // ★ PermissionGateでラップ: 権限がない場合はUIを表示せず、警告画面を出す
+    // PermissionGate Wrap
     PermissionGate {
         MainScreenContent(modifier, viewModel)
     }
 }
 
-/**
- * 権限取得後に表示される本来のメイン画面
- */
 @Composable
 private fun MainScreenContent(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = viewModel()
 ) {
-    // UI State
-    var selectedProjectId by remember { mutableStateOf("proj1") }
+    val selectedProjectId by viewModel.selectedProjectId.collectAsState()
     val files by viewModel.files.collectAsState()
     val context = LocalContext.current
     val isSearchVisible = rememberSaveable { mutableStateOf(false) }
     val searchQuery by viewModel.searchQuery.collectAsState()
     val currentPath by viewModel.currentPath.collectAsState()
 
-    // Map FileItems to FileNodes for the UI
+    // UI Mapping
     val fileNodes = remember(files) {
         files.map { fileItem ->
             FileNode(
                 id = fileItem.path,
                 name = fileItem.name,
                 isDirectory = fileItem.isDirectory,
-                children = emptyList(), // Recursive loading not yet implemented
+                children = emptyList(),
                 depth = 0
             )
         }
     }
 
-    // Back Handling
-    // ルートディレクトリ、またはパスが空の場合は戻る動作を無効化（アプリ終了などへ委譲）
     val isRoot = currentPath.isEmpty() || currentPath == android.os.Environment.getExternalStorageDirectory().path
 
     BackHandler(enabled = !isRoot) {
@@ -132,7 +121,7 @@ private fun MainScreenContent(
     CircuitBackground(modifier = modifier.fillMaxSize()) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            containerColor = Color.Transparent, // Transparent to show CircuitBackground
+            containerColor = Color.Transparent,
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = { /* Handle Add */ },
@@ -144,23 +133,17 @@ private fun MainScreenContent(
                         pressedElevation = 4.dp
                     )
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add Item"
-                    )
+                    Icon(Icons.Default.Add, contentDescription = "Add Item")
                 }
             },
             bottomBar = {
-                // Cyberpunk styled Bottom Bar
+                // Bottom Bar Implementation
                 NavigationBar(
-                    containerColor = Color(0xFF00221C), // Calm Deep Green
+                    containerColor = Color(0xFF00221C),
                     modifier = Modifier.border(
                         width = 1.dp,
                         brush = Brush.verticalGradient(
-                            colors = listOf(
-                                NeonEmerald.copy(alpha = 0.3f),
-                                Color.Transparent
-                            )
+                            colors = listOf(NeonEmerald.copy(alpha = 0.3f), Color.Transparent)
                         ),
                         shape = RectangleShape
                     )
@@ -180,15 +163,12 @@ private fun MainScreenContent(
                     )
                     NavigationBarItem(
                         selected = isSearchVisible.value,
-                        onClick = {
-                            isSearchVisible.value = !isSearchVisible.value
-                        },
+                        onClick = { isSearchVisible.value = !isSearchVisible.value },
                         icon = { Icon(Icons.Default.Search, null) },
                         label = { Text("Search") },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = NeonEmerald,
                             selectedTextColor = NeonEmerald,
-                            // DeepMetallic の代わりに Theme 定義済みの surfaceVariant を使用
                             indicatorColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     )
@@ -200,7 +180,6 @@ private fun MainScreenContent(
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = NeonEmerald,
                             selectedTextColor = NeonEmerald,
-                            // DeepMetallic の代わりに Theme 定義済みの surfaceVariant を使用
                             indicatorColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     )
@@ -212,31 +191,31 @@ private fun MainScreenContent(
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                // Left Sidebar - Project Tabs
+                // Project Sidebar
                 ProjectSidebar(
                     projects = SampleProjects.projects,
                     selectedProjectId = selectedProjectId,
                     modifier = Modifier.fillMaxHeight(),
                     onProjectSelected = { project ->
-                        selectedProjectId = project.id
+                        viewModel.onProjectSelected(project.id)
                     }
                 )
 
-                // Main Content Area
+                // Main Area
                 Column(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
                 ) {
-                    // Dashboard Header
+                    // Dashboard Header (Linker)
                     DashboardHeader(
                         fileCount = fileNodes.size,
-                        onLaunchBugCodex = {
-                            viewModel.launchBugCodex(context)
+                        onLaunchApp = { app ->
+                            viewModel.launchSpokeApp(context, app)
                         }
                     )
 
-                    // Address Bar (Breadcrumbs)
+                    // Address Bar
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -252,7 +231,7 @@ private fun MainScreenContent(
                         )
                     }
 
-                    // Search Bar
+                    // Search Input
                     if (isSearchVisible.value) {
                         OutlinedTextField(
                             value = searchQuery,
@@ -281,7 +260,7 @@ private fun MainScreenContent(
                         )
                     }
 
-                    // File Tree Content
+                    // File List
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -291,10 +270,10 @@ private fun MainScreenContent(
                     ) {
                         FileTree(
                             nodes = fileNodes,
-                            modifier = Modifier.padding(bottom = 80.dp), // Check FAB overlap
+                            modifier = Modifier.padding(bottom = 80.dp),
                             onNodeClick = { node ->
                                 if (node.isDirectory) {
-                                    viewModel.navigateTo(node.id) // node.id holds path
+                                    viewModel.navigateTo(node.id)
                                 } else {
                                     FileOpener.openFile(context, File(node.id))
                                 }
@@ -307,11 +286,15 @@ private fun MainScreenContent(
     }
 }
 
+/**
+ * DashboardHeader - The Launchpad
+ * 4つのSpokeアプリ起動ボタンを配置した拡張版ヘッダー
+ */
 @Composable
 fun DashboardHeader(
     modifier: Modifier = Modifier,
     fileCount: Int = 0,
-    onLaunchBugCodex: () -> Unit = {}
+    onLaunchApp: (SpokeApp) -> Unit = {}
 ) {
     GlassCard(
         modifier = modifier
@@ -321,75 +304,82 @@ fun DashboardHeader(
         cornerRadius = 12.dp,
         borderWidth = 1.dp
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .padding(16.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth()
         ) {
-            Column {
-                Text(
-                    text = "PROJECT STATUS",
-                    style = SectionHeaderStyle,
-                    color = NeonEmerald,
-                    fontSize = 12.sp
-                )
-                Text(
-                    text = "ACTIVE",
-                    style = Typography.headlineMedium,
-                    color = TextPrimary
-                )
+            // Top Row: Status
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(text = "PROJECT STATUS", style = SectionHeaderStyle, color = NeonEmerald, fontSize = 12.sp)
+                    Text(text = "ACTIVE", style = Typography.headlineMedium, color = TextPrimary)
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(text = "TOTAL FILES", style = SectionHeaderStyle, color = TextSecondary, fontSize = 10.sp)
+                    Text(text = "$fileCount", style = Typography.titleLarge, color = TextPrimary)
+                }
             }
 
-            // 右側の情報カラム
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = "TOTAL FILES",
-                    style = SectionHeaderStyle,
-                    color = TextSecondary,
-                    fontSize = 10.sp
-                )
-                Text(
-                    text = "$fileCount",
-                    style = Typography.titleLarge,
-                    color = TextPrimary
-                )
+            Spacer(modifier = Modifier.height(16.dp))
 
-                Spacer(modifier = Modifier.padding(top = 8.dp))
+            // Bottom Row: Launchers (4 Apps)
+            Text(text = "LINKED MODULES", style = SectionHeaderStyle, color = TextSecondary, fontSize = 10.sp)
+            Spacer(modifier = Modifier.height(8.dp))
 
-                FilledTonalButton(
-                    onClick = onLaunchBugCodex,
-                    colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = NeonEmerald.copy(alpha = 0.2f),
-                        contentColor = NeonEmerald
-                    ),
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                    modifier = Modifier.height(32.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.BugReport,
-                        contentDescription = "Open BugCodex",
-                        modifier = Modifier.size(16.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // BugCodex, DailySync, Abbozzo, VetroCodex
+                SpokeApp.entries.forEach { app ->
+                    AppLaunchButton(
+                        app = app,
+                        onClick = { onLaunchApp(app) },
+                        modifier = Modifier.weight(1f)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("BUGS", fontSize = 12.sp)
                 }
             }
         }
     }
 }
 
-@Preview(
-    showBackground = true,
-    backgroundColor = 0xFF050505,
-    widthDp = 400,
-    heightDp = 800
-)
+@Composable
+private fun AppLaunchButton(
+    app: SpokeApp,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    FilledTonalButton(
+        onClick = onClick,
+        colors = ButtonDefaults.filledTonalButtonColors(
+            containerColor = NeonEmerald.copy(alpha = 0.1f),
+            contentColor = NeonEmerald
+        ),
+        contentPadding = PaddingValues(vertical = 8.dp),
+        shape = RoundedCornerShape(8.dp),
+        modifier = modifier.height(48.dp) // 高さ固定で揃える
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = app.icon,
+                contentDescription = app.appName,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(text = app.actionLabel, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+        }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF050505)
 @Composable
 private fun MainScreenPreview() {
     DivChromaTheme {
-        // Preview用のダミーViewModelが必要ですが、ここでは簡易的に呼び出します
-        // 実際にはWrapper等が必要です
+        // Preview
     }
 }
