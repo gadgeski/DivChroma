@@ -6,7 +6,9 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,10 +26,13 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -47,6 +52,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,6 +72,8 @@ import com.gadgeski.divchroma.ui.theme.SectionHeaderStyle
 import com.gadgeski.divchroma.ui.theme.TextPrimary
 import com.gadgeski.divchroma.ui.theme.TextSecondary
 import com.gadgeski.divchroma.ui.theme.Typography
+import com.gadgeski.divchroma.utils.FileOpener
+import java.io.File
 
 /**
  * MainScreen - Primary UI layout for DivChroma
@@ -77,12 +86,14 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = viewModel()
 ) {
+    // UI State
     var selectedProjectId by remember { mutableStateOf("proj1") }
     val files by viewModel.files.collectAsState()
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     val isSearchVisible = rememberSaveable { mutableStateOf(false) }
     val searchQuery by viewModel.searchQuery.collectAsState()
-    
+    val currentPath by viewModel.currentPath.collectAsState()
+
     // Map FileItems to FileNodes for the UI
     val fileNodes = remember(files) {
         files.map { fileItem ->
@@ -90,17 +101,17 @@ fun MainScreen(
                 id = fileItem.path,
                 name = fileItem.name,
                 isDirectory = fileItem.isDirectory,
-                children = emptyList(), // Recursive loading not yet implemented
+                children = emptyList(),
+                // Recursive loading not yet implemented
                 depth = 0
             )
         }
     }
-    
-    // Back Handling - Valid implementation
-    // Navigate up if not at root
-    val currentPath by viewModel.currentPath.collectAsState()
+
+    // Back Handling
+    // ルートディレクトリ、またはパスが空の場合は戻る動作を無効化（アプリ終了などへ委譲）
     val isRoot = currentPath.isEmpty() || currentPath == android.os.Environment.getExternalStorageDirectory().path
-    
+
     BackHandler(enabled = !isRoot) {
         viewModel.navigateUp()
     }
@@ -108,7 +119,8 @@ fun MainScreen(
     CircuitBackground(modifier = modifier.fillMaxSize()) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            containerColor = Color.Transparent, // Transparent to show CircuitBackground
+            containerColor = Color.Transparent,
+            // Transparent to show CircuitBackground
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = { /* Handle Add */ },
@@ -127,8 +139,10 @@ fun MainScreen(
                 }
             },
             bottomBar = {
+                // Cyberpunk styled Bottom Bar
                 NavigationBar(
-                    containerColor = Color(0xFF00221C), // Calm Deep Green
+                    containerColor = Color(0xFF00221C),
+                    // Calm Deep Green
                     modifier = Modifier.border(
                         width = 1.dp,
                         brush = Brush.verticalGradient(
@@ -155,9 +169,7 @@ fun MainScreen(
                     )
                     NavigationBarItem(
                         selected = isSearchVisible.value,
-                        // .value を追加
                         onClick = {
-                            // 下記に.value をつけることで、IDEに「読んでるし書いてるよ！」と伝えます。
                             isSearchVisible.value = !isSearchVisible.value
                         },
                         icon = { Icon(Icons.Default.Search, null) },
@@ -165,10 +177,11 @@ fun MainScreen(
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = NeonEmerald,
                             selectedTextColor = NeonEmerald,
-                            indicatorColor = DeepMetallic
+                            // DeepMetallic の代わりに Theme 定義済みの surfaceVariant を使用
+                            indicatorColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     )
-                     NavigationBarItem(
+                    NavigationBarItem(
                         selected = false,
                         onClick = { },
                         icon = { Icon(Icons.Default.Settings, null) },
@@ -176,7 +189,8 @@ fun MainScreen(
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = NeonEmerald,
                             selectedTextColor = NeonEmerald,
-                            indicatorColor = DeepMetallic
+                            // DeepMetallic の代わりに Theme 定義済みの surfaceVariant を使用
+                            indicatorColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     )
                 }
@@ -196,7 +210,7 @@ fun MainScreen(
                         selectedProjectId = project.id
                     }
                 )
-                
+
                 // Main Content Area
                 Column(
                     modifier = Modifier
@@ -205,14 +219,12 @@ fun MainScreen(
                 ) {
                     // Dashboard Header
                     DashboardHeader(
+                        fileCount = fileNodes.size,
                         onLaunchBugCodex = {
-                            // 現在のプロジェクト（サイドバーで選択中）の名前を取得して投げる
-                            // ※SampleProjectsの運用に合わせて、選択中のIDから名前を引くロジックを入れるとベストですが、
-                            // まずは「現在開いているフォルダ」ベースの launchBugCodex を呼びます。
                             viewModel.launchBugCodex(context)
                         }
                     )
-                    
+
                     // Address Bar (Breadcrumbs)
                     Row(
                         modifier = Modifier
@@ -224,14 +236,14 @@ fun MainScreen(
                         Text(
                             text = displayPath,
                             color = NeonEmerald,
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                            fontFamily = FontFamily.Monospace,
                             fontSize = 14.sp
                         )
                     }
 
                     // Search Bar
                     if (isSearchVisible.value) {
-                         OutlinedTextField(
+                        OutlinedTextField(
                             value = searchQuery,
                             onValueChange = { viewModel.onSearchQueryChange(it) },
                             modifier = Modifier
@@ -248,7 +260,7 @@ fun MainScreen(
                                 unfocusedBorderColor = GlassBorder
                             ),
                             trailingIcon = {
-                                IconButton(onClick = { 
+                                IconButton(onClick = {
                                     viewModel.onSearchQueryChange("")
                                     isSearchVisible.value = false
                                 }) {
@@ -273,8 +285,7 @@ fun MainScreen(
                                 if (node.isDirectory) {
                                     viewModel.navigateTo(node.id) // node.id holds path
                                 } else {
-                                    // Open file
-                                    com.gadgeski.divchroma.utils.FileOpener.openFile(context, java.io.File(node.id))
+                                    FileOpener.openFile(context, File(node.id))
                                 }
                             }
                         )
@@ -288,15 +299,14 @@ fun MainScreen(
 @Composable
 fun DashboardHeader(
     modifier: Modifier = Modifier,
+    fileCount: Int = 0,
     onLaunchBugCodex: () -> Unit = {}
-// ★ New: コールバックを追加
 ) {
     GlassCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(16.dp),
         isActive = true,
-        // Force active style for glow
         cornerRadius = 12.dp,
         borderWidth = 1.dp
     ) {
@@ -323,7 +333,6 @@ fun DashboardHeader(
 
             // 右側の情報カラム
             Column(horizontalAlignment = Alignment.End) {
-                // 既存のファイル数表示
                 Text(
                     text = "TOTAL FILES",
                     style = SectionHeaderStyle,
@@ -331,22 +340,20 @@ fun DashboardHeader(
                     fontSize = 10.sp
                 )
                 Text(
-                    text = "12",
+                    text = "$fileCount",
                     style = Typography.titleLarge,
                     color = TextPrimary
                 )
 
-                // ★ New: BugCodex 起動ボタン
-                // 少しスペースを開けて配置
-                androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(top = 8.dp))
+                Spacer(modifier = Modifier.padding(top = 8.dp))
 
-                androidx.compose.material3.FilledTonalButton(
+                FilledTonalButton(
                     onClick = onLaunchBugCodex,
-                    colors = androidx.compose.material3.ButtonDefaults.filledTonalButtonColors(
+                    colors = ButtonDefaults.filledTonalButtonColors(
                         containerColor = NeonEmerald.copy(alpha = 0.2f),
                         contentColor = NeonEmerald
                     ),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                     modifier = Modifier.height(32.dp)
                 ) {
                     Icon(
@@ -354,7 +361,7 @@ fun DashboardHeader(
                         contentDescription = "Open BugCodex",
                         modifier = Modifier.size(16.dp)
                     )
-                    androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text("BUGS", fontSize = 12.sp)
                 }
             }
@@ -371,6 +378,7 @@ fun DashboardHeader(
 @Composable
 private fun MainScreenPreview() {
     DivChromaTheme {
-        MainScreen()
+        // Preview用のダミーViewModelが必要ですが、ここでは簡易的に呼び出します
+        // 実際にはWrapper等が必要です
     }
 }

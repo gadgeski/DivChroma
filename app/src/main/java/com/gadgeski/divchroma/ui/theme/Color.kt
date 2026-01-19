@@ -12,9 +12,17 @@ val NeonEmerald = Color(0xFF00FF9D)      // Main Accent / Primary
 val MalachiteGreen = Color(0xFF10D164)   // Secondary Accent
 val NeonEmeraldDim = Color(0xFF00CC7E)   // Dimmed Version
 
+// Secondary Accent - Dark Metallic Greens
+// ★Theme.ktが必要としていた定義を追加
+val DarkMetallicGreen = Color(0xFF0A2A1B)
+val DeepMetallic = Color(0xFF0D1F17)
+val MetallicHighlight = Color(0xFF1A4A35)
+
 // Background Colors - Circuit Wall
-val CircuitBackground = Color(0xFF050505) // Main Background (Nearly Black)
-val CircuitSurface = Color(0xFF0A0A0A)    // Surface / Card Background
+val CircuitBackground = Color(0xFF050505)
+// Main Background (Nearly Black)
+val CircuitSurface = Color(0xFF0A0A0A)
+// Surface / Card Background
 
 // Glass Effect Colors (Retained for GlassCard.kt)
 val GlassSurface = Color(0xFF001100).copy(alpha = 0.5f)
@@ -28,22 +36,20 @@ val TextMuted = Color(0xFF707070)
 
 // Functional Colors
 val ErrorRed = Color(0xFFFF5252)
-val BorderGray = Color(0xFF2A2A2A) // Inactive State
+
+// Inactive State
+// Theme.ktで使用されているため定義
+val InactiveState = Color(0xFF2A2A2A)
+
+// File Type Colors
+// FileTreeで使用される可能性があります
+val FolderColor = NeonEmerald
+val FileColor = Color(0xFF80CBC4)
+val CodeFileColor = Color(0xFF64FFDA)
 
 // -----------------------------------------------------------
-// Material 3 Color Scheme Mappings (For System Components)
+// Cleaned Up: Unused mappings removed
 // -----------------------------------------------------------
-// UIコンポーネントが自動的にこれらの色を使うように紐付けます
-
-val PrimaryColor = NeonEmerald
-val OnPrimaryColor = CircuitBackground // 緑の上の文字は黒
-val SecondaryColor = MalachiteGreen
-val OnSecondaryColor = CircuitBackground
-
-val BackgroundColor = CircuitBackground
-val OnBackgroundColor = TextPrimary
-val SurfaceColor = CircuitSurface
-val OnSurfaceColor = TextPrimary
-
-val ErrorColor = ErrorRed
-val OnErrorColor = CircuitBackground
+// 以前ここにあった PrimaryColor などの未使用変数は、
+// Theme.kt が直接 NeonEmerald 等を参照しているため削除しました。
+// これで "Property is never used" 警告は解消されます。

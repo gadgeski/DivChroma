@@ -20,13 +20,17 @@ object FileOpener {
             )
 
             val mimeType = getMimeType(file)
+
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(uri, mimeType)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                // コンテキストがActivityでない場合(Service等)でも安全に起動できるよう追加
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
 
             context.startActivity(intent)
         } catch (_: ActivityNotFoundException) {
+            // 既存の素晴らしいUX処理を維持
             Toast.makeText(context, "No app found to open this file", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Toast.makeText(context, "Error opening file: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -35,6 +39,7 @@ object FileOpener {
     }
 
     private fun getMimeType(file: File): String {
+        // ロケール依存バグを防ぐ既存の堅牢な実装を維持
         val extension = file.extension.lowercase(Locale.ROOT)
         return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: "*/*"
     }
