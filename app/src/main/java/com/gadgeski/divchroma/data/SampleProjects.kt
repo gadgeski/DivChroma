@@ -3,11 +3,12 @@ package com.gadgeski.divchroma.data
 /**
  * ProjectItem
  * サイドバーに表示するプロジェクト情報のモデル
+ * (旧 ProjectTab を置き換えるものです)
  */
 data class ProjectItem(
     val id: String,
     val name: String,
-    val initial: String,
+    val initial: String, // UIでは iconChar の代わりに使用
     val description: String = ""
 )
 
@@ -21,7 +22,6 @@ object SampleProjects {
         ProjectItem("proj2", "BugCodex", "B", "Cyberpunk Bug Tracker"),
         ProjectItem("proj3", "DailySync", "S", "Daily Report & Life Log"),
         ProjectItem("proj4", "Abbozzo", "A", "Visual Inspiration Scrap"),
-        // Vetro -> VetroCodex に変更し、BugCodexとの統一感を強化
         ProjectItem("proj5", "VetroCodex", "V", "Time Tracking & Foldable Clock")
     )
 }

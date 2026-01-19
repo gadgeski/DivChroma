@@ -64,7 +64,6 @@ import com.gadgeski.divchroma.ui.components.CircuitBackground
 import com.gadgeski.divchroma.ui.components.FileTree
 import com.gadgeski.divchroma.ui.components.GlassCard
 import com.gadgeski.divchroma.ui.components.ProjectSidebar
-import com.gadgeski.divchroma.ui.theme.DeepMetallic
 import com.gadgeski.divchroma.ui.theme.DivChromaTheme
 import com.gadgeski.divchroma.ui.theme.GlassBorder
 import com.gadgeski.divchroma.ui.theme.NeonEmerald

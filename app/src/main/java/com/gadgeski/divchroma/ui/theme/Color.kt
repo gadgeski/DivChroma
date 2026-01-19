@@ -8,9 +8,12 @@ import androidx.compose.ui.graphics.Color
 // ═══════════════════════════════════════════════════════════════
 
 // Primary Accent - Neon Emerald
-val NeonEmerald = Color(0xFF00FF9D)      // Main Accent / Primary
-val MalachiteGreen = Color(0xFF10D164)   // Secondary Accent
-val NeonEmeraldDim = Color(0xFF00CC7E)   // Dimmed Version
+val NeonEmerald = Color(0xFF00FF9D)
+// Main Accent / Primary
+val MalachiteGreen = Color(0xFF10D164)
+// Secondary Accent
+val NeonEmeraldDim = Color(0xFF00CC7E)
+// Dimmed Version
 
 // Secondary Accent - Dark Metallic Greens
 // ★Theme.ktが必要としていた定義を追加
