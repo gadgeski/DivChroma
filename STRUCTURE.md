@@ -23,7 +23,8 @@ DivChroma/
 │       │   │               ├── data
 │       │   │               │   ├── FileItem.kt
 │       │   │               │   ├── FileRepository.kt
-│       │   │               │   └── SampleProjects.kt
+│       │   │               │   ├── SampleProjects.kt
+│       │   │               │   └── SpokeApp.kt
 │       │   │               ├── ui
 │       │   │               │   ├── components
 │       │   │               │   │   ├── CircuitBackground.kt
@@ -42,6 +43,7 @@ DivChroma/
 │       │   │               │       ├── Theme.kt
 │       │   │               │       └── Type.kt
 │       │   │               └── utils
+│       │   │                   ├── ContextLinker.kt
 │       │   │                   ├── EcoSystemLauncher.kt
 │       │   │                   └── FileOpener.kt
 │       │   └── res
@@ -101,5 +103,5 @@ DivChroma/
 ├── local.properties
 └── settings.gradle.kts
 
-39 directories, 62 files
+39 directories, 64 files
 ```
