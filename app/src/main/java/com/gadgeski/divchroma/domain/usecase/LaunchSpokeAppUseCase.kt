@@ -1,24 +1,29 @@
-package com.gadgeski.divchroma.utils
+package com.gadgeski.divchroma.domain.usecase
 
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import com.gadgeski.divchroma.data.SpokeApp
+import javax.inject.Inject
 
 /**
- * ContextLinker
- * 現在のコンテキスト(Project, Path)をIntentに注入し、
- * Spokeアプリを起動するためのユーティリティクラス。
+ * LaunchSpokeAppUseCase
+ * エコシステム(Spoke App)を起動するためのユースケース。
+ * Utils (ContextLinker) にあったロジックをドメイン層へ移動し、
+ * DI (Hilt) 可能にすることでテスト容易性とアーキテクチャの整合性を高めました。
  */
-object ContextLinker {
+class LaunchSpokeAppUseCase @Inject constructor() {
 
-    private const val EXTRA_PROJECT_ID = "EXTRA_PROJECT_ID"
-    private const val EXTRA_PROJECT_PATH = "EXTRA_PROJECT_PATH"
+    companion object {
+        private const val EXTRA_PROJECT_ID = "EXTRA_PROJECT_ID"
+        private const val EXTRA_PROJECT_PATH = "EXTRA_PROJECT_PATH"
+    }
 
     /**
-     * 指定されたSpokeアプリを、コンテキスト付きで起動します。
+     * 指定されたアプリを起動し、プロジェクトコンテキストを注入します。
+     * operator fun invoke を使用することで、関数のように呼び出せます。
      */
-    fun launch(
+    operator fun invoke(
         context: Context,
         app: SpokeApp,
         projectId: String,
@@ -38,8 +43,7 @@ object ContextLinker {
                 }
                 context.startActivity(launchIntent)
             } else {
-                // アプリが見つからない場合
-                // 将来的にはPlay Storeへの誘導などが考えられます
+                // アプリ未インストール時のハンドリング
                 Toast.makeText(
                     context,
                     "Linkage Error: ${app.appName} module not found.",

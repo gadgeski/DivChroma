@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.gadgeski.divchroma.data.FileItem
 import com.gadgeski.divchroma.data.FileRepository
 import com.gadgeski.divchroma.data.SpokeApp
-import com.gadgeski.divchroma.utils.ContextLinker
+import com.gadgeski.divchroma.domain.usecase.LaunchSpokeAppUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,14 +16,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val repository: FileRepository
+    private val repository: FileRepository,
+    // Inject: UseCaseを注入（ContextLinkerへの依存を排除）
+    private val launchSpokeAppUseCase: LaunchSpokeAppUseCase
 ) : ViewModel() {
 
     // 現在のパス
     private val _currentPath = MutableStateFlow("")
     val currentPath: StateFlow<String> = _currentPath.asStateFlow()
 
-    // 現在選択中のプロジェクトID (初期値は仮)
+    // 現在選択中のプロジェクトID
     private val _selectedProjectId = MutableStateFlow("proj1")
     val selectedProjectId: StateFlow<String> = _selectedProjectId.asStateFlow()
 
@@ -74,14 +76,15 @@ class MainViewModel @Inject constructor(
      */
     fun onProjectSelected(projectId: String) {
         _selectedProjectId.value = projectId
-        // 将来的に、プロジェクト選択と同時にそのルートディレクトリへジャンプするロジックをここに追加可能
     }
 
     /**
-     * EcoSystem連携: 指定されたSpokeアプリを起動
+     * EcoSystem連携: UseCaseを使用してSpokeアプリを起動
+     * ContextLinker (Utils) への直接依存を排除しました。
      */
     fun launchSpokeApp(context: Context, app: SpokeApp) {
-        ContextLinker.launch(
+        // UseCaseを実行 (invoke operatorにより関数のように呼べる)
+        launchSpokeAppUseCase(
             context = context,
             app = app,
             projectId = _selectedProjectId.value,
