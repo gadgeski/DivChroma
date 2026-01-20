@@ -54,7 +54,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+// HiltViewModelを使用するためにimportを変更
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.gadgeski.divchroma.data.FileNode
 import com.gadgeski.divchroma.data.SampleProjects
 import com.gadgeski.divchroma.data.SpokeApp
@@ -79,7 +80,8 @@ import java.io.File
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel = viewModel()
+    // Fix: viewModel() -> hiltViewModel() に変更してDIを有効化
+    viewModel: MainViewModel = hiltViewModel()
 ) {
     // PermissionGate Wrap
     PermissionGate {
@@ -90,7 +92,7 @@ fun MainScreen(
 @Composable
 private fun MainScreenContent(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel = viewModel()
+    viewModel: MainViewModel
 ) {
     val selectedProjectId by viewModel.selectedProjectId.collectAsState()
     val files by viewModel.files.collectAsState()
