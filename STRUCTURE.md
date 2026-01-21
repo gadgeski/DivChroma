@@ -25,6 +25,9 @@ DivChroma/
 │       │   │               │   ├── FileRepository.kt
 │       │   │               │   ├── SampleProjects.kt
 │       │   │               │   └── SpokeApp.kt
+│       │   │               ├── domain
+│       │   │               │   └── usecase
+│       │   │               │       └── LaunchSpokeAppUseCase.kt
 │       │   │               ├── ui
 │       │   │               │   ├── components
 │       │   │               │   │   ├── CircuitBackground.kt
@@ -43,7 +46,6 @@ DivChroma/
 │       │   │               │       ├── Theme.kt
 │       │   │               │       └── Type.kt
 │       │   │               └── utils
-│       │   │                   ├── ContextLinker.kt
 │       │   │                   └── FileOpener.kt
 │       │   └── res
 │       │       ├── drawable
@@ -102,5 +104,5 @@ DivChroma/
 ├── local.properties
 └── settings.gradle.kts
 
-39 directories, 63 files
+41 directories, 63 files
 ```
