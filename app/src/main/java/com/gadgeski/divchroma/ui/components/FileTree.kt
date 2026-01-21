@@ -1,6 +1,7 @@
 package com.gadgeski.divchroma.ui.components
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,7 +33,9 @@ import com.gadgeski.divchroma.ui.theme.TextSecondary
 fun FileTree(
     nodes: List<FileNode>,
     modifier: Modifier = Modifier,
-    onNodeClick: (FileNode) -> Unit
+    onNodeClick: (FileNode) -> Unit,
+    // Add: 長押しイベントを追加
+    onNodeLongClick: (FileNode) -> Unit = {}
 ) {
     if (nodes.isEmpty()) {
         EmptyStateMessage(modifier)
@@ -43,7 +46,8 @@ fun FileTree(
             items(nodes) { node ->
                 FileTreeNodeItem(
                     node = node,
-                    onClick = { onNodeClick(node) }
+                    onClick = { onNodeClick(node) },
+                    onLongClick = { onNodeLongClick(node) }
                 )
                 // ハッカーライクな区切り線（極細）
                 HorizontalDivider(
@@ -70,15 +74,21 @@ private fun EmptyStateMessage(modifier: Modifier) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FileTreeNodeItem(
     node: FileNode,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            // combinedClickable を使用して長押しに対応
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
             .padding(vertical = 12.dp, horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

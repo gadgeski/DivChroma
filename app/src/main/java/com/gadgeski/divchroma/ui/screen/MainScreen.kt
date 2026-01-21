@@ -1,6 +1,7 @@
 package com.gadgeski.divchroma.ui.screen
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -20,10 +21,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -36,13 +40,19 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -63,6 +73,7 @@ import com.gadgeski.divchroma.ui.components.GlassCard
 import com.gadgeski.divchroma.ui.components.PermissionGate
 import com.gadgeski.divchroma.ui.components.ProjectSidebar
 import com.gadgeski.divchroma.ui.theme.DivChromaTheme
+import com.gadgeski.divchroma.ui.theme.ErrorRed
 import com.gadgeski.divchroma.ui.theme.GlassBorder
 import com.gadgeski.divchroma.ui.theme.NeonEmerald
 import com.gadgeski.divchroma.ui.theme.SectionHeaderStyle
@@ -98,7 +109,29 @@ private fun MainScreenContent(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val currentPath by viewModel.currentPath.collectAsState()
 
+    // Snackbar State
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Context Menu State
+    var contextMenuNode by remember { mutableStateOf<FileNode?>(null) }
+
+    // Collect Snackbar Events
+    LaunchedEffect(Unit) {
+        viewModel.snackbarEvent.collect { message ->
+            val result = snackbarHostState.showSnackbar(
+                message = message,
+                actionLabel = "UNDO",
+                duration = SnackbarDuration.Short
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                viewModel.undoDelete()
+            }
+        }
+    }
+
     // UI Mapping
+    // Note: FileItem is needed for deletion logic, so we need to map back or find it.
+    // For simplicity, we find the matching FileItem from the list when needed.
     val fileNodes = remember(files) {
         files.map { fileItem ->
             FileNode(
@@ -121,6 +154,7 @@ private fun MainScreenContent(
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             containerColor = Color.Transparent,
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = { /* Handle Add */ },
@@ -259,14 +293,12 @@ private fun MainScreenContent(
                         )
                     }
 
-                    // File List
-                    // FIX: verticalScrollを削除。FileTree内のLazyColumnにスクロールを任せる
+                    // File List Content
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
                             .padding(horizontal = 16.dp, vertical = 8.dp)
-                        // .verticalScroll(rememberScrollState()) <-- 削除しました
                     ) {
                         FileTree(
                             nodes = fileNodes,
@@ -277,8 +309,32 @@ private fun MainScreenContent(
                                 } else {
                                     FileOpener.openFile(context, File(node.id))
                                 }
+                            },
+                            onNodeLongClick = { node ->
+                                contextMenuNode = node
                             }
                         )
+
+                        // Context Menu (Delete)
+                        if (contextMenuNode != null) {
+                            DropdownMenu(
+                                expanded = true,
+                                onDismissRequest = { contextMenuNode = null },
+                                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("Delete", color = ErrorRed) },
+                                    leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null, tint = ErrorRed) },
+                                    onClick = {
+                                        val targetFileItem = files.find { it.path == contextMenuNode?.id }
+                                        if (targetFileItem != null) {
+                                            viewModel.deleteFile(targetFileItem)
+                                        }
+                                        contextMenuNode = null
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }

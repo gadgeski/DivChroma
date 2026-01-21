@@ -16,7 +16,6 @@ import javax.inject.Singleton
 class FileRepository @Inject constructor() {
 
     // 除外するシステムフォルダのリスト（ルート階層のみ適用）
-    // ユーザーリクエストに基づき、不要な標準フォルダを定義
     private val ignoredSystemFolders = setOf(
         "Alarms",
         "Android",
@@ -45,14 +44,11 @@ class FileRepository @Inject constructor() {
         val rootFile = getRootDirectory()
         val rootPath = rootFile.absolutePath
 
-        // パスが空ならルートを使用
         val targetPath = path.ifEmpty { rootPath }
         val directory = File(targetPath)
 
-        // 現在ルートディレクトリを見ているか判定
         val isRoot = targetPath == rootPath
 
-        // 存在チェック
         if (!directory.exists() || !directory.isDirectory) {
             return@withContext emptyList()
         }
@@ -61,6 +57,7 @@ class FileRepository @Inject constructor() {
             directory.listFiles()
                 ?.filter { file ->
                     // 1. 隠しファイル (.) を除外
+                    // ※削除待機中の .deleted ファイルもここで自動的に除外されます
                     if (file.name.startsWith(".")) return@filter false
 
                     // 2. ルート階層の場合のみ、不要なシステムフォルダを除外
@@ -69,7 +66,6 @@ class FileRepository @Inject constructor() {
                     true
                 }
                 ?.map { file ->
-                    // FileItemへの変換
                     FileItem(
                         file = file,
                         name = file.name,
@@ -80,12 +76,43 @@ class FileRepository @Inject constructor() {
                         extension = file.extension
                     )
                 }
-                // ソート順: ディレクトリ優先 -> 名前順 (大文字小文字無視)
                 ?.sortedWith(compareBy({ !it.isDirectory }, { it.name.lowercase() }))
                 ?: emptyList()
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList()
+        }
+    }
+
+    /**
+     * ファイルまたはディレクトリを物理削除します。
+     * ※取り消し不能な操作です。UndoロジックはViewModel側で制御し、
+     * 最終的なクリーンアップとしてこのメソッドを使用することを推奨します。
+     */
+    suspend fun deleteFile(file: File): Boolean = withContext(Dispatchers.IO) {
+        return@withContext try {
+            if (file.isDirectory) {
+                file.deleteRecursively()
+            } else {
+                file.delete()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    /**
+     * ファイルのリネーム（移動）を行います。
+     * Undo機能の実装（一時的な隠しファイルへの退避）にも使用します。
+     */
+    suspend fun renameFile(source: File, newName: String): Boolean = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val destination = File(source.parentFile, newName)
+            source.renameTo(destination)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 }

@@ -8,16 +8,19 @@ import com.gadgeski.divchroma.data.FileRepository
 import com.gadgeski.divchroma.data.SpokeApp
 import com.gadgeski.divchroma.domain.usecase.LaunchSpokeAppUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: FileRepository,
-    // Inject: UseCaseを注入（ContextLinkerへの依存を排除）
     private val launchSpokeAppUseCase: LaunchSpokeAppUseCase
 ) : ViewModel() {
 
@@ -36,6 +39,14 @@ class MainViewModel @Inject constructor(
     // 検索クエリ
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    // スナックバー通知用イベント (One-shot event)
+    private val _snackbarEvent = MutableSharedFlow<String>()
+    val snackbarEvent: SharedFlow<String> = _snackbarEvent.asSharedFlow()
+
+    // Undo用の履歴保持 (削除されたファイルの元の名前と、一時退避名を保持)
+    private var lastDeletedFile: File? = null
+    private var lastDeletedFileTempName: String? = null
 
     init {
         loadRoot()
@@ -60,7 +71,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun navigateUp() {
-        val currentFile = java.io.File(_currentPath.value)
+        val currentFile = File(_currentPath.value)
         val parent = currentFile.parentFile
         if (parent != null && parent.canRead()) {
             navigateTo(parent.absolutePath)
@@ -71,24 +82,72 @@ class MainViewModel @Inject constructor(
         _searchQuery.value = query
     }
 
-    /**
-     * プロジェクト選択の更新
-     */
     fun onProjectSelected(projectId: String) {
         _selectedProjectId.value = projectId
     }
 
-    /**
-     * EcoSystem連携: UseCaseを使用してSpokeアプリを起動
-     * ContextLinker (Utils) への直接依存を排除しました。
-     */
     fun launchSpokeApp(context: Context, app: SpokeApp) {
-        // UseCaseを実行 (invoke operatorにより関数のように呼べる)
         launchSpokeAppUseCase(
             context = context,
             app = app,
             projectId = _selectedProjectId.value,
             currentPath = _currentPath.value
         )
+    }
+
+    /**
+     * ファイルの削除（論理削除）
+     * 1. UIから即座に消すために、隠しファイル (.deleted) にリネームする
+     * 2. Undo用情報を保持する
+     * 3. スナックバーを表示する
+     */
+    fun deleteFile(fileItem: FileItem) {
+        viewModelScope.launch {
+            val originalFile = fileItem.file
+            val tempName = ".${originalFile.name}.deleted" // 隠しファイル化
+
+            // リポジトリの renameFile を使用 (これで警告は消えます)
+            val success = repository.renameFile(originalFile, tempName)
+
+            if (success) {
+                // Undo情報を保存
+                lastDeletedFile = File(originalFile.parentFile, tempName)
+                lastDeletedFileTempName = originalFile.name // 元の名前
+
+                // リストをリロードしてUI反映 (隠しファイルは自動的に除外される)
+                loadFiles(_currentPath.value)
+
+                // スナックバー表示要求
+                _snackbarEvent.emit("File deleted")
+            } else {
+                _snackbarEvent.emit("Failed to delete file")
+            }
+        }
+    }
+
+    /**
+     * 直近の削除を元に戻す (Undo)
+     */
+    fun undoDelete() {
+        val targetFile = lastDeletedFile
+        val originalName = lastDeletedFileTempName
+
+        if (targetFile != null && originalName != null && targetFile.exists()) {
+            viewModelScope.launch {
+                // 元の名前にリネームして復元
+                val success = repository.renameFile(targetFile, originalName)
+
+                if (success) {
+                    loadFiles(_currentPath.value)
+                    _snackbarEvent.emit("File restored")
+                } else {
+                    _snackbarEvent.emit("Failed to restore file")
+                }
+
+                // 履歴クリア
+                lastDeletedFile = null
+                lastDeletedFileTempName = null
+            }
+        }
     }
 }
