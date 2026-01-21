@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -54,7 +53,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-// HiltViewModelを使用するためにimportを変更
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gadgeski.divchroma.data.FileNode
 import com.gadgeski.divchroma.data.SampleProjects
@@ -80,7 +78,6 @@ import java.io.File
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    // Fix: viewModel() -> hiltViewModel() に変更してDIを有効化
     viewModel: MainViewModel = hiltViewModel()
 ) {
     // PermissionGate Wrap
@@ -263,12 +260,13 @@ private fun MainScreenContent(
                     }
 
                     // File List
+                    // FIX: verticalScrollを削除。FileTree内のLazyColumnにスクロールを任せる
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
                             .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .verticalScroll(rememberScrollState())
+                        // .verticalScroll(rememberScrollState()) <-- 削除しました
                     ) {
                         FileTree(
                             nodes = fileNodes,
@@ -288,10 +286,7 @@ private fun MainScreenContent(
     }
 }
 
-/**
- * DashboardHeader - The Launchpad
- * 4つのSpokeアプリ起動ボタンを配置した拡張版ヘッダー
- */
+// DashboardHeader, AppLaunchButton, Preview... (変更なし)
 @Composable
 fun DashboardHeader(
     modifier: Modifier = Modifier,
