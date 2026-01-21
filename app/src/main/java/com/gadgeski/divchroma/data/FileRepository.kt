@@ -15,6 +15,20 @@ import javax.inject.Singleton
 @Singleton
 class FileRepository @Inject constructor() {
 
+    // 除外するシステムフォルダのリスト（ルート階層のみ適用）
+    // ユーザーリクエストに基づき、不要な標準フォルダを定義
+    private val ignoredSystemFolders = setOf(
+        "Alarms",
+        "Android",
+        "Audiobooks",
+        "Movies",
+        "Music",
+        "Notifications",
+        "Podcasts",
+        "Recordings",
+        "Ringtones"
+    )
+
     /**
      * ルートディレクトリを取得します
      */
@@ -24,18 +38,19 @@ class FileRepository @Inject constructor() {
 
     /**
      * 指定されたパスのファイル一覧を取得します。
-     * 既存コードのロジックを継承しつつ、非同期処理化しています。
      *
      * @param path 対象のディレクトリパス。空文字の場合はルートディレクトリを使用します。
      */
     suspend fun getFiles(path: String = ""): List<FileItem> = withContext(Dispatchers.IO) {
-        // 既存コードのロジックを踏襲: 空ならルートへフォールバック
-        // Kotlinの ifEmpty 拡張関数を使用してスマートに記述
-        val targetPath = path.ifEmpty {
-            getRootDirectory().absolutePath
-        }
+        val rootFile = getRootDirectory()
+        val rootPath = rootFile.absolutePath
 
+        // パスが空ならルートを使用
+        val targetPath = path.ifEmpty { rootPath }
         val directory = File(targetPath)
+
+        // 現在ルートディレクトリを見ているか判定
+        val isRoot = targetPath == rootPath
 
         // 存在チェック
         if (!directory.exists() || !directory.isDirectory) {
@@ -44,8 +59,15 @@ class FileRepository @Inject constructor() {
 
         try {
             directory.listFiles()
-                ?.filter { !it.name.startsWith(".") }
-                // 隠しファイル除外 (標準的なファイラー挙動)
+                ?.filter { file ->
+                    // 1. 隠しファイル (.) を除外
+                    if (file.name.startsWith(".")) return@filter false
+
+                    // 2. ルート階層の場合のみ、不要なシステムフォルダを除外
+                    if (isRoot && ignoredSystemFolders.contains(file.name)) return@filter false
+
+                    true
+                }
                 ?.map { file ->
                     // FileItemへの変換
                     FileItem(
