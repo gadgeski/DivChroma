@@ -16,9 +16,11 @@ import javax.inject.Singleton
 class FileRepository @Inject constructor() {
 
     // 除外するシステムフォルダのリスト（ルート階層のみ適用）
+    // 開発に関係のない標準フォルダや、アクセス制限のあるシステムフォルダを除外して
+    // コックピットの視認性を最大化します。
     private val ignoredSystemFolders = setOf(
         "Alarms",
-        "Android",
+        "Android",      // System data (Restricted access & High risk)
         "Audiobooks",
         "Movies",
         "Music",
@@ -44,11 +46,14 @@ class FileRepository @Inject constructor() {
         val rootFile = getRootDirectory()
         val rootPath = rootFile.absolutePath
 
+        // パスが空ならルートを使用
         val targetPath = path.ifEmpty { rootPath }
         val directory = File(targetPath)
 
+        // 現在ルートディレクトリを見ているか判定
         val isRoot = targetPath == rootPath
 
+        // 存在チェック
         if (!directory.exists() || !directory.isDirectory) {
             return@withContext emptyList()
         }
@@ -57,7 +62,6 @@ class FileRepository @Inject constructor() {
             directory.listFiles()
                 ?.filter { file ->
                     // 1. 隠しファイル (.) を除外
-                    // ※削除待機中の .deleted ファイルもここで自動的に除外されます
                     if (file.name.startsWith(".")) return@filter false
 
                     // 2. ルート階層の場合のみ、不要なシステムフォルダを除外
@@ -66,6 +70,7 @@ class FileRepository @Inject constructor() {
                     true
                 }
                 ?.map { file ->
+                    // FileItemへの変換
                     FileItem(
                         file = file,
                         name = file.name,
@@ -76,6 +81,7 @@ class FileRepository @Inject constructor() {
                         extension = file.extension
                     )
                 }
+                // ソート順: ディレクトリ優先 -> 名前順 (大文字小文字無視)
                 ?.sortedWith(compareBy({ !it.isDirectory }, { it.name.lowercase() }))
                 ?: emptyList()
         } catch (e: Exception) {
@@ -86,9 +92,10 @@ class FileRepository @Inject constructor() {
 
     /**
      * ファイルまたはディレクトリを物理削除します。
-     * ※取り消し不能な操作です。UndoロジックはViewModel側で制御し、
-     * 最終的なクリーンアップとしてこのメソッドを使用することを推奨します。
+     * ※現在は論理削除(リネーム)を優先しているため未使用ですが、
+     * 将来的な「完全削除」機能のために保持します。
      */
+    @Suppress("unused")
     suspend fun deleteFile(file: File): Boolean = withContext(Dispatchers.IO) {
         return@withContext try {
             if (file.isDirectory) {
