@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
@@ -52,7 +53,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -68,10 +68,12 @@ import com.gadgeski.divchroma.data.FileNode
 import com.gadgeski.divchroma.data.SampleProjects
 import com.gadgeski.divchroma.data.SpokeApp
 import com.gadgeski.divchroma.ui.components.CircuitBackground
+import com.gadgeski.divchroma.ui.components.CreateFolderDialog
 import com.gadgeski.divchroma.ui.components.FileTree
 import com.gadgeski.divchroma.ui.components.GlassCard
 import com.gadgeski.divchroma.ui.components.PermissionGate
 import com.gadgeski.divchroma.ui.components.ProjectSidebar
+import com.gadgeski.divchroma.ui.components.RenameDialog
 import com.gadgeski.divchroma.ui.theme.DivChromaTheme
 import com.gadgeski.divchroma.ui.theme.ErrorRed
 import com.gadgeski.divchroma.ui.theme.GlassBorder
@@ -105,7 +107,10 @@ private fun MainScreenContent(
     val selectedProjectId by viewModel.selectedProjectId.collectAsState()
     val files by viewModel.files.collectAsState()
     val context = LocalContext.current
+
+    // UI States (Refactored to State Objects to avoid IDE warnings)
     val isSearchVisible = rememberSaveable { mutableStateOf(false) }
+
     val searchQuery by viewModel.searchQuery.collectAsState()
     val currentPath by viewModel.currentPath.collectAsState()
 
@@ -113,7 +118,14 @@ private fun MainScreenContent(
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Context Menu State
-    var contextMenuNode by remember { mutableStateOf<FileNode?>(null) }
+    val contextMenuNode = remember { mutableStateOf<FileNode?>(null) }
+
+    // Rename Dialog State
+    val showRenameDialog = remember { mutableStateOf(false) }
+    val renameTargetNode = remember { mutableStateOf<FileNode?>(null) }
+
+    // Create Folder Dialog State
+    val showCreateFolderDialog = rememberSaveable { mutableStateOf(false) }
 
     // Collect Snackbar Events
     LaunchedEffect(Unit) {
@@ -130,8 +142,6 @@ private fun MainScreenContent(
     }
 
     // UI Mapping
-    // Note: FileItem is needed for deletion logic, so we need to map back or find it.
-    // For simplicity, we find the matching FileItem from the list when needed.
     val fileNodes = remember(files) {
         files.map { fileItem ->
             FileNode(
@@ -157,7 +167,8 @@ private fun MainScreenContent(
             snackbarHost = { SnackbarHost(snackbarHostState) },
             floatingActionButton = {
                 FloatingActionButton(
-                    onClick = { /* Handle Add */ },
+                    // Access via .value
+                    onClick = { showCreateFolderDialog.value = true },
                     containerColor = NeonEmerald,
                     contentColor = Color.Black,
                     shape = RoundedCornerShape(16.dp),
@@ -311,30 +322,67 @@ private fun MainScreenContent(
                                 }
                             },
                             onNodeLongClick = { node ->
-                                contextMenuNode = node
+                                contextMenuNode.value = node
                             }
                         )
 
-                        // Context Menu (Delete)
-                        if (contextMenuNode != null) {
+                        // Context Menu (Delete/Rename)
+                        if (contextMenuNode.value != null) {
                             DropdownMenu(
                                 expanded = true,
-                                onDismissRequest = { contextMenuNode = null },
+                                onDismissRequest = { contextMenuNode.value = null },
                                 modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                             ) {
+                                // Rename Option
+                                DropdownMenuItem(
+                                    text = { Text("Rename", color = TextPrimary) },
+                                    leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null, tint = TextPrimary) },
+                                    onClick = {
+                                        renameTargetNode.value = contextMenuNode.value
+                                        showRenameDialog.value = true
+                                        contextMenuNode.value = null
+                                    }
+                                )
+                                // Delete Option
                                 DropdownMenuItem(
                                     text = { Text("Delete", color = ErrorRed) },
                                     leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null, tint = ErrorRed) },
                                     onClick = {
-                                        val targetFileItem = files.find { it.path == contextMenuNode?.id }
+                                        val targetFileItem = files.find { it.path == contextMenuNode.value?.id }
                                         if (targetFileItem != null) {
                                             viewModel.deleteFile(targetFileItem)
                                         }
-                                        contextMenuNode = null
+                                        contextMenuNode.value = null
                                     }
                                 )
                             }
                         }
+                    }
+
+                    // Rename Dialog
+                    if (showRenameDialog.value && renameTargetNode.value != null) {
+                        RenameDialog(
+                            initialName = renameTargetNode.value!!.name,
+                            onDismiss = { showRenameDialog.value = false },
+                            onConfirm = { newName ->
+                                val targetFileItem = files.find { it.path == renameTargetNode.value?.id }
+                                if (targetFileItem != null) {
+                                    viewModel.renameFile(targetFileItem, newName)
+                                }
+                                showRenameDialog.value = false
+                            }
+                        )
+                    }
+
+                    // Create Folder Dialog
+                    if (showCreateFolderDialog.value) {
+                        CreateFolderDialog(
+                            onDismiss = { showCreateFolderDialog.value = false },
+                            onConfirm = { folderName ->
+                                viewModel.createFolder(folderName)
+                                showCreateFolderDialog.value = false
+                            }
+                        )
                     }
                 }
             }

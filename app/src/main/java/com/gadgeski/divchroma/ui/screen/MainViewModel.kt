@@ -150,4 +150,43 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * ファイルのリネーム
+     */
+    fun renameFile(fileItem: FileItem, newName: String) {
+        viewModelScope.launch {
+            val sourceFile = fileItem.file
+            if (newName.isBlank()) return@launch
+
+            val success = repository.renameFile(sourceFile, newName)
+
+            if (success) {
+                loadFiles(_currentPath.value)
+                _snackbarEvent.emit("File renamed")
+            } else {
+                _snackbarEvent.emit("Failed to rename file")
+            }
+        }
+    }
+
+    /**
+     * 新規フォルダの作成
+     * FAB (Floating Action Button) から呼び出されます。
+     */
+    fun createFolder(folderName: String) {
+        viewModelScope.launch {
+            if (folderName.isBlank()) return@launch
+
+            // Repositoryの createDirectory を呼び出し
+            val success = repository.createDirectory(_currentPath.value, folderName)
+
+            if (success) {
+                loadFiles(_currentPath.value)
+                _snackbarEvent.emit("Folder created")
+            } else {
+                _snackbarEvent.emit("Failed to create folder")
+            }
+        }
+    }
 }

@@ -91,6 +91,24 @@ class FileRepository @Inject constructor() {
     }
 
     /**
+     * 新規ディレクトリを作成します。
+     */
+    suspend fun createDirectory(parentPath: String, folderName: String): Boolean = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val parent = File(parentPath)
+            if (!parent.exists() || !parent.isDirectory) return@withContext false
+
+            val newDir = File(parent, folderName)
+            if (newDir.exists()) return@withContext false // 既に存在する場合は失敗
+
+            newDir.mkdirs()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    /**
      * ファイルまたはディレクトリを物理削除します。
      * ※現在は論理削除(リネーム)を優先しているため未使用ですが、
      * 将来的な「完全削除」機能のために保持します。
