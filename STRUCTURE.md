@@ -42,7 +42,8 @@ DivChroma/
 │       │   │               │   │   └── Screen.kt
 │       │   │               │   ├── screen
 │       │   │               │   │   ├── MainScreen.kt
-│       │   │               │   │   └── MainViewModel.kt
+│       │   │               │   │   ├── MainViewModel.kt
+│       │   │               │   │   └── SettingsScreen.kt
 │       │   │               │   └── theme
 │       │   │               │       ├── Color.kt
 │       │   │               │       ├── Theme.kt
@@ -106,5 +107,5 @@ DivChroma/
 ├── local.properties
 └── settings.gradle.kts
 
-41 directories, 65 files
+41 directories, 66 files
 ```
