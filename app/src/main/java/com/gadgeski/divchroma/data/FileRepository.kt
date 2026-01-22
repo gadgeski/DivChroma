@@ -10,17 +10,14 @@ import javax.inject.Singleton
 /**
  * FileRepository
  * ファイルシステムへのアクセスを一元管理します。
- * Hilt (@Inject) と Coroutines (suspend) に対応し、メインスレッドをブロックしません。
  */
 @Singleton
 class FileRepository @Inject constructor() {
 
     // 除外するシステムフォルダのリスト（ルート階層のみ適用）
-    // 開発に関係のない標準フォルダや、アクセス制限のあるシステムフォルダを除外して
-    // コックピットの視認性を最大化します。
     private val ignoredSystemFolders = setOf(
         "Alarms",
-        "Android",      // System data (Restricted access & High risk)
+        "Android",
         "Audiobooks",
         "Movies",
         "Music",
@@ -39,21 +36,20 @@ class FileRepository @Inject constructor() {
 
     /**
      * 指定されたパスのファイル一覧を取得します。
+     * Update: showHidden フラグを追加
      *
-     * @param path 対象のディレクトリパス。空文字の場合はルートディレクトリを使用します。
+     * @param path 対象のディレクトリパス
+     * @param showHidden 隠しファイル(.から始まるファイル)を表示するかどうか
      */
-    suspend fun getFiles(path: String = ""): List<FileItem> = withContext(Dispatchers.IO) {
+    suspend fun getFiles(path: String = "", showHidden: Boolean = false): List<FileItem> = withContext(Dispatchers.IO) {
         val rootFile = getRootDirectory()
         val rootPath = rootFile.absolutePath
 
-        // パスが空ならルートを使用
         val targetPath = path.ifEmpty { rootPath }
         val directory = File(targetPath)
 
-        // 現在ルートディレクトリを見ているか判定
         val isRoot = targetPath == rootPath
 
-        // 存在チェック
         if (!directory.exists() || !directory.isDirectory) {
             return@withContext emptyList()
         }
@@ -61,16 +57,17 @@ class FileRepository @Inject constructor() {
         try {
             directory.listFiles()
                 ?.filter { file ->
-                    // 1. 隠しファイル (.) を除外
-                    if (file.name.startsWith(".")) return@filter false
+                    // 1. 隠しファイル (.) の制御
+                    // showHiddenがfalse かつ .で始まる場合は除外
+                    if (!showHidden && file.name.startsWith(".")) return@filter false
 
                     // 2. ルート階層の場合のみ、不要なシステムフォルダを除外
+                    // (これはシステム設定なのでshowHiddenに関わらず常に除外します)
                     if (isRoot && ignoredSystemFolders.contains(file.name)) return@filter false
 
                     true
                 }
                 ?.map { file ->
-                    // FileItemへの変換
                     FileItem(
                         file = file,
                         name = file.name,
@@ -81,7 +78,6 @@ class FileRepository @Inject constructor() {
                         extension = file.extension
                     )
                 }
-                // ソート順: ディレクトリ優先 -> 名前順 (大文字小文字無視)
                 ?.sortedWith(compareBy({ !it.isDirectory }, { it.name.lowercase() }))
                 ?: emptyList()
         } catch (e: Exception) {
@@ -90,6 +86,7 @@ class FileRepository @Inject constructor() {
         }
     }
 
+    // ... createDirectory, deleteFile, renameFile (変更なし) ...
     /**
      * 新規ディレクトリを作成します。
      */
@@ -99,7 +96,7 @@ class FileRepository @Inject constructor() {
             if (!parent.exists() || !parent.isDirectory) return@withContext false
 
             val newDir = File(parent, folderName)
-            if (newDir.exists()) return@withContext false // 既に存在する場合は失敗
+            if (newDir.exists()) return@withContext false
 
             newDir.mkdirs()
         } catch (e: Exception) {
@@ -108,11 +105,6 @@ class FileRepository @Inject constructor() {
         }
     }
 
-    /**
-     * ファイルまたはディレクトリを物理削除します。
-     * ※現在は論理削除(リネーム)を優先しているため未使用ですが、
-     * 将来的な「完全削除」機能のために保持します。
-     */
     @Suppress("unused")
     suspend fun deleteFile(file: File): Boolean = withContext(Dispatchers.IO) {
         return@withContext try {
@@ -127,10 +119,6 @@ class FileRepository @Inject constructor() {
         }
     }
 
-    /**
-     * ファイルのリネーム（移動）を行います。
-     * Undo機能の実装（一時的な隠しファイルへの退避）にも使用します。
-     */
     suspend fun renameFile(source: File, newName: String): Boolean = withContext(Dispatchers.IO) {
         return@withContext try {
             val destination = File(source.parentFile, newName)

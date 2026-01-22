@@ -40,6 +40,10 @@ class MainViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
+    // ★追加: 隠しファイル表示フラグ
+    private val _showHiddenFiles = MutableStateFlow(false)
+    val showHiddenFiles: StateFlow<Boolean> = _showHiddenFiles.asStateFlow()
+
     // スナックバー通知用イベント (One-shot event)
     private val _snackbarEvent = MutableSharedFlow<String>()
     val snackbarEvent: SharedFlow<String> = _snackbarEvent.asSharedFlow()
@@ -58,9 +62,10 @@ class MainViewModel @Inject constructor(
         loadFiles(root.absolutePath)
     }
 
+    // ★更新: 隠しファイル設定(_showHiddenFiles.value)を渡してロードするように変更
     private fun loadFiles(path: String) {
         viewModelScope.launch {
-            val fileList = repository.getFiles(path)
+            val fileList = repository.getFiles(path, _showHiddenFiles.value)
             _files.value = fileList
         }
     }
@@ -95,6 +100,13 @@ class MainViewModel @Inject constructor(
         )
     }
 
+    // ★追加: 隠しファイルの表示設定を切り替え
+    fun toggleHiddenFiles() {
+        _showHiddenFiles.value = !_showHiddenFiles.value
+        // 設定変更後に現在のパスでリロードして即座に反映
+        loadFiles(_currentPath.value)
+    }
+
     /**
      * ファイルの削除（論理削除）
      * 1. UIから即座に消すために、隠しファイル (.deleted) にリネームする
@@ -106,7 +118,7 @@ class MainViewModel @Inject constructor(
             val originalFile = fileItem.file
             val tempName = ".${originalFile.name}.deleted" // 隠しファイル化
 
-            // リポジトリの renameFile を使用 (これで警告は消えます)
+            // リポジトリの renameFile を使用
             val success = repository.renameFile(originalFile, tempName)
 
             if (success) {

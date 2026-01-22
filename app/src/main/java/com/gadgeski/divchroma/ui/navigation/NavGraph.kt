@@ -1,17 +1,16 @@
 package com.gadgeski.divchroma.ui.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navigation
 import com.gadgeski.divchroma.ui.screen.MainScreen
-import com.gadgeski.divchroma.ui.theme.NeonEmerald
-import com.gadgeski.divchroma.ui.theme.Typography
+import com.gadgeski.divchroma.ui.screen.MainViewModel
+import com.gadgeski.divchroma.ui.screen.SettingsScreen
 
 @Composable
 fun DivChromaNavGraph(
@@ -20,29 +19,32 @@ fun DivChromaNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route,
+        startDestination = "root", // ネストされたグラフのルート
         modifier = modifier
     ) {
-        // === HOME (Cockpit) ===
-        composable(Screen.Home.route) {
-            MainScreen(
-                // MainScreenから設定画面へ遷移する場合の処理などをここに書くことができます
-                // 現在のMainScreen実装に合わせて、まずは単純に表示します
-            )
-        }
+        // ViewModelを共有するためのネストされたナビゲーショングラフ
+        navigation(
+            startDestination = Screen.Home.route,
+            route = "root"
+        ) {
+            composable(Screen.Home.route) { entry ->
+                // 親ルート("root")に関連付けられたViewModelを取得
+                val parentEntry = remember(entry) {
+                    navController.getBackStackEntry("root")
+                }
+                val sharedViewModel = hiltViewModel<MainViewModel>(parentEntry)
 
-        // === SETTINGS (Placeholder) ===
-        composable(Screen.Settings.route) {
-            // TODO: 本格的なSettingsScreenを作成したら差し替えます
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "SYSTEM CONFIG // UNDER CONSTRUCTION",
-                    style = Typography.headlineMedium,
-                    color = NeonEmerald
-                )
+                MainScreen(viewModel = sharedViewModel)
+            }
+
+            composable(Screen.Settings.route) { entry ->
+                // 同じく親ルートのViewModelを取得 (これでインスタンスが共有される)
+                val parentEntry = remember(entry) {
+                    navController.getBackStackEntry("root")
+                }
+                val sharedViewModel = hiltViewModel<MainViewModel>(parentEntry)
+
+                SettingsScreen(viewModel = sharedViewModel)
             }
         }
     }
