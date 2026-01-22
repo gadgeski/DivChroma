@@ -31,10 +31,12 @@ DivChroma/
 │       │   │               ├── ui
 │       │   │               │   ├── components
 │       │   │               │   │   ├── CircuitBackground.kt
+│       │   │               │   │   ├── CreateFolderDialog.kt
 │       │   │               │   │   ├── FileTree.kt
 │       │   │               │   │   ├── GlassCard.kt
 │       │   │               │   │   ├── PermissionGate.kt
-│       │   │               │   │   └── ProjectSidebar.kt
+│       │   │               │   │   ├── ProjectSidebar.kt
+│       │   │               │   │   └── RenameDialog.kt
 │       │   │               │   ├── navigation
 │       │   │               │   │   ├── NavGraph.kt
 │       │   │               │   │   └── Screen.kt
@@ -104,5 +106,5 @@ DivChroma/
 ├── local.properties
 └── settings.gradle.kts
 
-41 directories, 63 files
+41 directories, 65 files
 ```
